@@ -120,3 +120,21 @@ Identique à l'app Notes de frais (`/root/projects/notes-de-frais`) :
   sommeil = qualité + réveils, export CSV + JSON, aucun rappel).
 - 01/11/2026 : ajout d'une plage horaire début / fin en heures pleines et du cas de la crise qui
   dépasse la soirée (report au lendemain, durée calculée, badge dans l'historique).
+- 01/11/2026 : second lot d'améliorations validé, toutes implémentées dans la v1.0.0 :
+  - déclencheurs suspectés (stress, fatigue, écran, chaleur, règles, sport, bruit, parfum, saut de
+    repas, sommeil court) ;
+  - médicament pris, efficacité, compteur mensuel de jours de prise et alerte aux seuils ICHD-3
+    (15 jours pour un antalgique simple, 10 jours pour un triptan) ;
+  - démarrage et clôture d'une crise en un tap, durée qui tourne sur l'écran de saisie ;
+  - report de fin à J+1, J+2 ou J+3 pour les crises de plus de 24 h ;
+  - ergonomie « en crise » : gros boutons, sections secondaires repliées, thème sombre par défaut ;
+  - statistiques honnêtes : profil horaire, jour de semaine, tendance 7 jours, effectifs affichés,
+    aucune corrélation conclue sous 5 cas ;
+  - synthèse PDF pour le médecin, verrouillage biométrique, sauvegarde JSON mensuelle automatique.
+  - écartés : météo et pression atmosphérique (réseau + position, résultat non concluant),
+    comptes et synchronisation cloud.
+
+## Écartés du hors périmètre initial
+
+- Le médicament, écarté au premier tour, a été réintégré au second : c'est le seul chiffre suivi
+  par le médecin (risque de céphalée par abus médicamenteux).
