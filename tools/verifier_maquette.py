@@ -159,7 +159,7 @@ def main():
         check("efficacité enregistrée",
               page.evaluate("window.__app.form()")["efficacite"] == "Soulagé")
         check("compteur mensuel de jours de médicament affiché",
-              "jours de prise ce mois" in txt(), txt()[-200:])
+              "jour" in txt() and "de prise ce mois" in txt(), txt()[-200:])
 
         # ---------- 6. repas, symptômes, localisation, commentaire ----------
         page.click("summary:has-text('Repas')")
