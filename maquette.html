@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette · Suivi des maux de tête</title>
+<style>
+  :root{
+    --bg:#0b0d13; --panel:#141824; --panel2:#1b2130; --line:#2a3244; --fg:#eef2ff; --dim:#8b97ad;
+    --accent:#5b6cff; --accent-soft:#5b6cff22;
+    --ok:#2fbf71; --warn:#f0a52b; --bad:#ef4d5a; --mid:#f28c28;
+    --n0:#2fbf71; --n1:#79c94a; --n2:#d7c62c; --n3:#f0a52b; --n4:#f28c28; --n5:#ef4d5a; --n6:#c22a3a;
+    --shadow:0 30px 70px rgba(0,0,0,.55);
+  }
+  html[data-theme="light"]{
+    --bg:#eef1f8; --panel:#ffffff; --panel2:#f5f7fd; --line:#dde3f0; --fg:#131a2b; --dim:#68738c;
+    --accent:#4353e8; --accent-soft:#4353e814;
+    --shadow:0 26px 60px rgba(24,35,66,.20);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--fg); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh; transition:background .25s,color .25s;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 20px 40px}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:20px}
+  .head h1{font-size:20px;margin:0 0 6px}
+  .head p{margin:0;color:var(--dim);font-size:13.5px;max-width:640px;line-height:1.5}
+  .btn-theme{
+    background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:10px;
+    padding:9px 14px;font-size:13px;cursor:pointer;font-weight:600
+  }
+  .layout{display:flex;gap:34px;align-items:flex-start;flex-wrap:wrap}
+  .phone{
+    width:390px;height:844px;background:var(--panel);border-radius:44px;border:1px solid var(--line);
+    box-shadow:var(--shadow);position:relative;overflow:hidden;display:flex;flex-direction:column;flex:0 0 auto
+  }
+  .statusbar{
+    height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+    padding:0 24px;font-size:12.5px;font-weight:600;color:var(--fg)
+  }
+  .statusbar .icons{display:flex;gap:6px;align-items:center;opacity:.85}
+  .content{flex:1 1 auto;overflow-y:auto;padding:2px 18px 16px;scrollbar-width:thin}
+  .content::-webkit-scrollbar{width:0}
+  .nav{
+    flex:0 0 auto;height:66px;border-top:1px solid var(--line);background:var(--panel2);
+    display:grid;grid-template-columns:repeat(4,1fr);align-items:center
+  }
+  .nav button{
+    background:none;border:0;color:var(--dim);display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:10.5px;font-weight:600;cursor:pointer;padding:6px 0;font-family:inherit
+  }
+  .nav button.on{color:var(--accent)}
+  .nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .toast{
+    position:absolute;left:16px;right:16px;bottom:82px;background:var(--fg);color:var(--panel);
+    padding:11px 14px;border-radius:12px;font-size:12.5px;font-weight:600;text-align:center;
+    opacity:0;transform:translateY(10px);transition:.22s;pointer-events:none;z-index:5
+  }
+  .toast.show{opacity:1;transform:translateY(0)}
+
+  /* écrans */
+  .h2{font-size:17px;font-weight:700;margin:10px 0 2px}
+  .sub{font-size:12px;color:var(--dim);margin:0 0 14px}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+  .card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .card-h .lbl{font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .hint{font-size:11px;color:var(--dim)}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;
+    padding:8px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;font-weight:600;transition:.15s
+  }
+  .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .chip.sm{padding:6px 10px;font-size:11.5px;font-weight:600}
+  input[type=datetime-local],input[type=text],textarea,select{
+    width:100%;background:var(--panel);border:1px solid var(--line);border-radius:11px;color:var(--fg);
+    padding:10px 12px;font-size:13px;font-family:inherit;outline:none
+  }
+  textarea{min-height:64px;resize:none}
+  .lvl{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+  .lvl b{font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+  .lvl span{font-size:12.5px;font-weight:700}
+  input[type=range]{-webkit-appearance:none;width:100%;height:26px;background:transparent}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:6px;background:linear-gradient(90deg,#2fbf71,#79c94a,#d7c62c,#f0a52b,#f28c28,#ef4d5a,#c22a3a)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--panel);box-shadow:0 2px 8px rgba(0,0,0,.4);margin-top:-7px}
+  .scale{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:-2px}
+  .stepper{display:flex;align-items:center;gap:10px}
+  .stepper button{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:16px;cursor:pointer;font-weight:700}
+  .stepper b{font-size:14px;min-width:22px;text-align:center}
+  .cta{
+    width:100%;border:0;border-radius:14px;background:var(--accent);color:#fff;padding:14px;
+    font-size:14.5px;font-weight:700;cursor:pointer;margin-top:4px;font-family:inherit
+  }
+  .cta.ghost{background:transparent;border:1px solid var(--line);color:var(--fg);margin-top:8px}
+  .cta:disabled{opacity:.5;cursor:default}
+
+  /* historique */
+  .mois{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--dim);text-transform:uppercase;margin:14px 0 8px}
+  .item{display:flex;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
+  .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .item .d1{font-size:13px;font-weight:700}
+  .item .d2{font-size:11.5px;color:var(--dim);margin-top:2px}
+  .item .niv{margin-left:auto;text-align:right;font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+  .item .niv small{display:block;font-size:9.5px;font-weight:700;color:var(--dim);letter-spacing:.04em}
+  .empty{color:var(--dim);font-size:13px;text-align:center;padding:40px 10px;line-height:1.6}
+
+  /* stats */
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:13px}
+  .kpi .v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+  .kpi .k{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.35}
+  .bars{display:flex;align-items:flex-end;gap:3px;height:104px;padding-top:6px}
+  .bars i{flex:1;border-radius:3px 3px 0 0;min-height:3px;display:block}
+  .legend{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:6px}
+  .corr{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--line)}
+  .corr:last-child{border-bottom:0}
+  .corr b{font-variant-numeric:tabular-nums}
+
+  /* export */
+  .file{display:flex;align-items:center;gap:10px;font-size:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .file:last-child{border-bottom:0}
+  .file .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .file .ok{color:var(--ok);font-weight:700;font-size:11px}
+  .prog{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:10px;display:none}
+  .prog.on{display:block}
+  .prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .18s}
+  .maj{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px}
+  .pill{font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+  .pill.ok{background:#2fbf7122;color:var(--ok)}
+
+  /* colonne droite */
+  .side{flex:1 1 340px;min-width:300px}
+  .side h3{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin:0 0 12px}
+  .steps{list-style:none;padding:0;margin:0 0 20px;counter-reset:s}
+  .steps li{counter-increment:s;position:relative;padding:0 0 14px 34px;font-size:13.5px;line-height:1.5}
+  .steps li:before{
+    content:counter(s);position:absolute;left:0;top:-1px;width:23px;height:23px;border-radius:50%;
+    background:var(--accent-soft);color:var(--accent);font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center
+  }
+  .steps li b{font-weight:700}
+  .note{font-size:12px;color:var(--dim);line-height:1.6;border-left:2px solid var(--line);padding-left:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Maquette · Suivi des maux de tête</h1>
+      <p>Simulateur cliquable de l'app Android. Parcours réel, données simulées plausibles, aucun réseau sollicité. Bascule clair / sombre en haut à droite.</p>
+    </div>
+    <button class="btn-theme" id="btnTheme">Thème clair</button>
+  </div>
+
+  <div class="layout">
+    <div class="phone" id="phone">
+      <div class="statusbar">
+        <span id="horloge">--:--</span>
+        <span class="icons">
+          <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><rect x="0" y="8" width="2.5" height="3.5" rx="1"/><rect x="4" y="6" width="2.5" height="5.5" rx="1"/><rect x="8" y="3" width="2.5" height="8.5" rx="1"/><rect x="12" y="0" width="2.5" height="11.5" rx="1"/></svg>
+          <svg width="18" height="13" viewBox="0 0 18 13" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 4.2a12 12 0 0 1 16 0M4 7a8 8 0 0 1 10 0M7 10a4 4 0 0 1 4 0"/></svg>
+          <svg width="22" height="12" viewBox="0 0 22 12"><rect x="0.6" y="0.6" width="18" height="10.8" rx="3" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".5"/><rect x="2.4" y="2.4" width="13" height="7.2" rx="1.8" fill="currentColor"/><rect x="20" y="4" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".6"/></svg>
+        </span>
+      </div>
+      <div class="content" id="content"></div>
+      <div class="nav" id="nav"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div class="side">
+      <h3>Ce que montre la maquette</h3>
+      <ol class="steps">
+        <li><b>Saisir</b> : date et heure déjà remplies, douleur 0 à 10, sommeil de la veille, repas (cases à cocher), symptômes, localisation, commentaire. Un seul bouton.</li>
+        <li><b>Historique</b> : crises groupées par mois, intensité en un coup d'oeil. Toucher une ligne la rouvre en modification.</li>
+        <li><b>Stats</b> : crises du mois, intensité moyenne, jours sans douleur, graphique des 30 derniers jours, effet du sommeil.</li>
+        <li><b>Export</b> : CSV pour Excel, sauvegarde JSON et restauration, puis vérification de mise à jour de l'APK.</li>
+      </ol>
+      <p class="note">Données de démonstration uniquement. L'app réelle stocke tout en local sur le téléphone (Room), sans compte ni cloud.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- utilitaires ---------- */
+const $ = (s) => document.querySelector(s);
+const pad = (n) => String(n).padStart(2, "0");
+const iso = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const isoLocal = (d) => iso(d) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+function joursAvant(n, h, m) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  d.setHours(h, m || 0, 0, 0);
+  return d;
+}
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const JOURS = ["dim","lun","mar","mer","jeu","ven","sam"];
+const REPAS = ["Sucré","Alcool","Fromage","Caféine","Charcuterie","Friture","Viande rouge","Repas sauté"];
+const SYMPT = ["Aura visuelle","Nausée","Gêne à la lumière","Gêne au bruit","Vertiges","Odeurs"];
+const LOCS = ["Tempes","Front","Arrière","Nuque","Un seul côté","Les deux côtés","Autour des yeux"];
+
+function couleurNiveau(n) {
+  if (n <= 1) return "var(--n0)";
+  if (n <= 3) return "var(--n1)";
+  if (n <= 4) return "var(--n2)";
+  if (n <= 6) return "var(--n3)";
+  if (n <= 7) return "var(--n4)";
+  if (n <= 9) return "var(--n5)";
+  return "var(--n6)";
+}
+function libelleNiveau(n) {
+  if (n === 0) return "aucune";
+  if (n <= 2) return "très légère";
+  if (n <= 4) return "gênante";
+  if (n <= 6) return "modérée";
+  if (n <= 8) return "forte";
+  return "invalidante";
+}
+function sommeilTxt(s) {
+  return s === "bon" ? "Bon" : s === "moyen" ? "Moyen" : "Mauvais";
+}
+
+/* ---------- données simulées ---------- */
+let DATA = [
+  { id: "s9", d: joursAvant(0, 7, 15), niveau: 4, sommeil: "moyen", reveils: 1,
+    repas: ["Caféine"], symptomes: ["Gêne à la lumière"], loc: ["Front"], com: "Réveil avec la douleur, un café et c'est passé." },
+  { id: "s8", d: joursAvant(1, 14, 20), niveau: 6, sommeil: "moyen", reveils: 1,
+    repas: ["Caféine","Sucré"], symptomes: ["Nausée","Gêne à la lumière"], loc: ["Tempes"], com: "Après la réunion de 14 h, pièce sans fenêtre." },
+  { id: "s7", d: joursAvant(3, 21, 40), niveau: 8, sommeil: "mauvais", reveils: 3,
+    repas: ["Alcool","Fromage"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit"], loc: ["Un seul côté"], com: "Aura 20 min avant, puis douleur derrière l'oeil droit." },
+  { id: "s6", d: joursAvant(5, 9, 10), niveau: 3, sommeil: "bon", reveils: 0,
+    repas: ["Charcuterie"], symptomes: [], loc: ["Front"], com: "" },
+  { id: "s5", d: joursAvant(8, 17, 5), niveau: 5, sommeil: "mauvais", reveils: 2,
+    repas: ["Caféine","Viande rouge"], symptomes: ["Gêne à la lumière"], loc: ["Les deux côtés","Tempes"], com: "Journée chargée, peu d'eau." },
+  { id: "s4", d: joursAvant(12, 11, 30), niveau: 7, sommeil: "moyen", reveils: 1,
+    repas: ["Sucré","Friture"], symptomes: ["Nausée"], loc: ["Nuque"], com: "Tension nuque depuis la veille." },
+  { id: "s3", d: joursAvant(16, 20, 15), niveau: 2, sommeil: "bon", reveils: 0,
+    repas: [], symptomes: [], loc: ["Front"], com: "" },
+  { id: "s2", d: joursAvant(19, 15, 45), niveau: 9, sommeil: "mauvais", reveils: 3,
+    repas: ["Alcool","Fromage","Charcuterie"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit","Vertiges"], loc: ["Un seul côté","Autour des yeux"], com: "Crise la plus forte du mois, au lit 3 h." },
+  { id: "s1", d: joursAvant(24, 8, 0), niveau: 4, sommeil: "moyen", reveils: 2,
+    repas: ["Caféine"], symptomes: ["Gêne au bruit"], loc: ["Tempes"], com: "" },
+  { id: "s0", d: joursAvant(28, 19, 20), niveau: 5, sommeil: "bon", reveils: 0,
+    repas: ["Repas sauté"], symptomes: ["Vertiges"], loc: ["Front","Tempes"], com: "Repas sauté, hypoglycémie probable." }
+];
+
+let seq = 0;
+let _rendus = 0;
+let S = {
+  ecran: "saisir",
+  edition: null,
+  fichierCSV: null,
+  fichierJSON: null,
+  majEtat: null,
+  form: formNeuf()
+};
+
+function formNeuf() {
+  return {
+    date: isoLocal(new Date()),
+    niveau: 5,
+    sommeil: "moyen",
+    reveils: 0,
+    repas: [],
+    symptomes: [],
+    loc: [],
+    com: ""
+  };
+}
+
+/* ---------- toast ---------- */
+let toastTimer = null;
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* ---------- rendu ---------- */
+function render() {
+  _rendus++;
+  $("#content").innerHTML = VUES[S.ecran]();
+  $("#content").scrollTop = S._scroll || 0;
+  rendreNav();
+}
+
+function rendreNav() {
+  const onglets = [
+    ["saisir", "Saisir", '<path d="M12 5v14M5 12h14"/>'],
+    ["histo", "Historique", '<path d="M4 5h16M4 12h16M4 19h10"/>'],
+    ["stats", "Stats", '<path d="M5 20V10M12 20V4M19 20v-7"/>'],
+    ["export", "Export", '<path d="M12 3v12M8 11l4 4 4-4M4 19h16"/>']
+  ];
+  $("#nav").innerHTML = onglets.map(([k, lbl, ico]) =>
+    '<button data-nav="' + k + '" class="' + (S.ecran === k ? "on" : "") + '">' +
+    '<svg viewBox="0 0 24 24">' + ico + '</svg><span>' + lbl + '</span></button>'
+  ).join("");
+}
+
+const VUES = {};
+
+/* ===== SAISIR ===== */
+VUES.saisir = function () {
+  const f = S.form;
+  return `
+  <div class="h2">${S.edition ? "Modifier la crise" : "Nouvelle crise"}</div>
+  <p class="sub">${S.edition ? "Enregistrée le " + fmtDateCourte(new Date(S.edition.d)) : "Renseigne ce que tu ressens, 30 secondes suffisent."}</p>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Date et heure</span><span class="hint">pré-remplies</span></div>
+    <input type="datetime-local" id="fDate" value="${f.date}">
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Niveau de douleur</span><span class="hint">0 · 10</span></div>
+    <div class="lvl">
+      <b id="lvlNum" style="color:${couleurNiveau(f.niveau)}">${f.niveau}</b>
+      <span id="lvlTxt" style="color:${couleurNiveau(f.niveau)}">${libelleNiveau(f.niveau)}</span>
+    </div>
+    <input type="range" id="fNiveau" min="0" max="10" step="1" value="${f.niveau}">
+    <div class="scale"><span>0 rien</span><span>5 gênant</span><span>10 invalidant</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Sommeil la veille</span></div>
+    <div class="chips" id="grpSommeil">
+      ${["bon","moyen","mauvais"].map(v => `<button class="chip ${f.sommeil === v ? "on" : ""}" data-sommeil="${v}">${sommeilTxt(v)}</button>`).join("")}
+    </div>
+    <div class="card-h" style="margin:12px 0 0"><span class="hint">Réveils nocturnes</span>
+      <span class="stepper">
+        <button data-reveil="-1">−</button><b id="revVal">${f.reveils}</b><button data-reveil="1">+</button>
+      </span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Repas d'avant</span><span class="hint">plusieurs choix</span></div>
+    <div class="chips">
+      ${REPAS.map(v => `<button class="chip sm ${f.repas.includes(v) ? "on" : ""}" data-repas="${v}">${v}</button>`).join("")}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Symptômes</span><span class="hint">plusieurs choix</span></div>
+    <div class="chips">
+      ${SYMPT.map(v => `<button class="chip sm ${f.symptomes.includes(v) ? "on" : ""}" data-sympt="${v}">${v}</button>`).join("")}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Localisation</span></div>
+    <div class="chips">
+      ${LOCS.map(v => `<button class="chip sm ${f.loc.includes(v) ? "on" : ""}" data-loc="${v}">${v}</button>`).join("")}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Commentaires</span><span class="hint">facultatif</span></div>
+    <textarea id="fCom" placeholder="Contexte, médicament pris, ce qui a aidé...">${f.com}</textarea>
+  </div>
+
+  <button class="cta" data-action="enregistrer">${S.edition ? "Mettre à jour" : "Enregistrer"}</button>
+  ${S.edition ? '<button class="cta ghost" data-action="annulerEdition">Annuler</button>' : ""}
+  <button class="cta ghost" data-action="vider">Réinitialiser</button>
+  <div class="hint" style="text-align:center;margin:10px 0 4px">${DATA.length} crise${DATA.length > 1 ? "s" : ""} enregistrée${DATA.length > 1 ? "s" : ""} · stockage local</div>
+  `;
+};
+
+/* ===== HISTORIQUE ===== */
+VUES.histo = function () {
+  const tri = DATA.slice().sort((a, b) => b.d - a.d);
+  if (!tri.length) return '<div class="empty">Aucune crise enregistrée.<br>Commence par l\'onglet Saisir.</div>';
+  let html = "";
+  let moisCourant = null;
+  tri.forEach(e => {
+    const cle = e.d.getFullYear() + "-" + e.d.getMonth();
+    if (cle !== moisCourant) {
+      moisCourant = cle;
+      html += '<div class="mois">' + MOIS[e.d.getMonth()] + " " + e.d.getFullYear() + "</div>";
+    }
+    const details = [];
+    details.push("sommeil " + sommeilTxt(e.sommeil).toLowerCase());
+    if (e.reveils > 0) details.push(e.reveils + " réveil" + (e.reveils > 1 ? "s" : ""));
+    if (e.symptomes.length) details.push(e.symptomes.slice(0, 2).join(", ").toLowerCase());
+    html += `
+      <div class="item" data-edit="${e.id}">
+        <span class="dot" style="background:${couleurNiveau(e.niveau)}"></span>
+        <span style="flex:1;min-width:0">
+          <span class="d1">${JOURS[e.d.getDay()]} ${e.d.getDate()} ${MOIS[e.d.getMonth()].slice(0,4)}. · ${pad(e.d.getHours())}:${pad(e.d.getMinutes())}</span>
+          <span class="d2">${details.join(" · ")}</span>
+        </span>
+        <span class="niv" style="color:${couleurNiveau(e.niveau)}">${e.niveau}<small>/10</small></span>
+      </div>`;
+  });
+  return '<div class="h2">Historique</div><p class="sub">' + DATA.length +
+    ' crises · touche une ligne pour modifier</p>' + html +
+    '<button class="cta ghost" data-nav-click="saisir">Ajouter une crise</button>';
+};
+
+/* ===== STATS ===== */
+VUES.stats = function () {
+  const now = new Date();
+  const duMois = DATA.filter(e => e.d.getFullYear() === now.getFullYear() && e.d.getMonth() === now.getMonth());
+  const debut30 = joursAvant(29, 0, 0);
+  const sur30 = DATA.filter(e => e.d >= debut30);
+  const moy = sur30.length ? (sur30.reduce((s, e) => s + e.niveau, 0) / sur30.length) : 0;
+  const joursCrise = new Set(sur30.map(e => iso(e.d))).size;
+  const sansDouleur = 30 - joursCrise;
+  const bon = DATA.filter(e => e.sommeil === "bon");
+  const mauvais = DATA.filter(e => e.sommeil === "mauvais");
+  const moyBon = bon.length ? (bon.reduce((s, e) => s + e.niveau, 0) / bon.length) : 0;
+  const moyMauvais = mauvais.length ? (mauvais.reduce((s, e) => s + e.niveau, 0) / mauvais.length) : 0;
+
+  let bars = "";
+  for (let i = 29; i >= 0; i--) {
+    const d = joursAvant(i, 12, 0);
+    const jour = iso(d);
+    const maxN = DATA.filter(e => iso(e.d) === jour).reduce((m, e) => Math.max(m, e.niveau), 0);
+    const h = maxN ? Math.max(6, Math.round(maxN / 10 * 100)) : 3;
+    const c = maxN ? couleurNiveau(maxN) : "var(--line)";
+    bars += '<i style="height:' + h + '%;background:' + c + '" title="' + jour + '"></i>';
+  }
+
+  return `
+  <div class="h2">Statistiques</div>
+  <p class="sub">${MOIS[now.getMonth()]} ${now.getFullYear()} et 30 derniers jours</p>
+  <div class="kpis">
+    <div class="kpi"><div class="v">${duMois.length}</div><div class="k">crise${duMois.length > 1 ? "s" : ""} ce mois</div></div>
+    <div class="kpi"><div class="v" style="color:${couleurNiveau(Math.round(moy))}">${moy.toFixed(1)}</div><div class="k">intensité moyenne sur 30 j</div></div>
+    <div class="kpi"><div class="v">${sansDouleur}</div><div class="k">jours sans douleur sur 30 j</div></div>
+    <div class="kpi"><div class="v">${joursCrise}</div><div class="k">jours avec douleur sur 30 j</div></div>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="lbl">30 derniers jours</span><span class="hint">hauteur = intensité</span></div>
+    <div class="bars">${bars}</div>
+    <div class="legend"><span>il y a 30 j</span><span>aujourd'hui</span></div>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="lbl">Effet du sommeil</span></div>
+    <div class="corr"><span>Après une bonne nuit</span><b style="color:var(--ok)">${moyBon.toFixed(1)} / 10</b></div>
+    <div class="corr"><span>Après une mauvaise nuit</span><b style="color:var(--bad)">${moyMauvais.toFixed(1)} / 10</b></div>
+    <div class="corr"><span>Écart</span><b>+${(moyMauvais - moyBon).toFixed(1)}</b></div>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="lbl">Repas les plus fréquents avant une crise</span></div>
+    ${topRepas().map(([r, n]) => '<div class="corr"><span>' + r + '</span><b>' + n + '</b></div>').join("")}
+  </div>`;
+};
+
+function topRepas() {
+  const c = {};
+  DATA.forEach(e => e.repas.forEach(r => { c[r] = (c[r] || 0) + 1; }));
+  return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 4);
+}
+
+/* ===== EXPORT ===== */
+VUES.export = function () {
+  const fichiers = [];
+  if (S.fichierCSV) fichiers.push(S.fichierCSV);
+  if (S.fichierJSON) fichiers.push(S.fichierJSON);
+  return `
+  <div class="h2">Export et sauvegarde</div>
+  <p class="sub">Tout reste sur le téléphone, l'export partage le fichier où tu veux.</p>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Exporter les données</span></div>
+    <button class="cta ghost" data-action="csv" style="margin-top:0">Exporter en CSV (Excel)</button>
+    <button class="cta ghost" data-action="json">Sauvegarde complète (JSON)</button>
+    <button class="cta ghost" data-action="restaurer">Restaurer une sauvegarde</button>
+    <div class="prog" id="prog"><i></i></div>
+    ${fichiers.length ? fichiers.map(f =>
+      '<div class="file"><span class="nm">' + f.nom + '</span><span class="ok">' + f.taille + '</span></div>').join("") : ""}
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Application</span><span class="pill">v1.0.0</span></div>
+    <div class="maj">
+      <span style="color:var(--dim)">Mise à jour GitHub</span>
+      <span class="pill ${S.majEtat === "ok" ? "ok" : ""}">${libMaj()}</span>
+    </div>
+    <button class="cta ghost" data-action="maj" style="margin-top:12px">Vérifier maintenant</button>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Confidentialité</span></div>
+    <div class="hint" style="line-height:1.6">Aucun compte, aucun serveur de santé. La seule connexion sortante est la vérification de version sur GitHub.</div>
+  </div>`;
+};
+
+function libMaj() {
+  if (S.majEtat === "check") return "vérification...";
+  if (S.majEtat === "ok") return "à jour";
+  if (S.majEtat === "new") return "v1.1.0 disponible";
+  return "jamais vérifié";
+}
+
+/* ---------- actions ---------- */
+function enregistrer() {
+  const f = S.form;
+  if (S.edition) {
+    S.edition.niveau = f.niveau;
+    S.edition.d = new Date(f.date);
+    S.edition.sommeil = f.sommeil;
+    S.edition.reveils = f.reveils;
+    S.edition.repas = f.repas.slice();
+    S.edition.symptomes = f.symptomes.slice();
+    S.edition.loc = f.loc.slice();
+    S.edition.com = f.com;
+    S.edition = null;
+    toast("Crise mise à jour");
+  } else {
+    DATA.push({
+      id: "n" + (++seq),
+      d: new Date(f.date),
+      niveau: f.niveau,
+      sommeil: f.sommeil,
+      reveils: f.reveils,
+      repas: f.repas.slice(),
+      symptomes: f.symptomes.slice(),
+      loc: f.loc.slice(),
+      com: f.com
+    });
+    toast("Crise enregistrée · " + DATA.length + " au total");
+  }
+  S.form = formNeuf();
+  render();
+}
+
+function toggle(tab, val) {
+  const i = tab.indexOf(val);
+  if (i >= 0) tab.splice(i, 1);
+  else tab.push(val);
+}
+
+const ACTIONS = {
+  enregistrer,
+  vider() { S.form = formNeuf(); S.edition = null; render(); toast("Formulaire réinitialisé"); },
+  annulerEdition() { S.edition = null; S.form = formNeuf(); render(); },
+  csv() {
+    progresser(() => {
+      const n = DATA.length;
+      S.fichierCSV = { nom: "maux-de-tete_" + iso(new Date()) + ".csv", taille: "2,4 Ko" };
+      render();
+      toast("CSV prêt · " + n + " crises exportées");
+    });
+  },
+  json() {
+    progresser(() => {
+      S.fichierJSON = { nom: "sauvegarde_maux-de-tete_" + iso(new Date()) + ".json", taille: "9,1 Ko" };
+      render();
+      toast("Sauvegarde complète créée");
+    });
+  },
+  restaurer() { toast("Sélectionne le fichier JSON dans tes téléchargements"); },
+  maj() {
+    S.majEtat = "check";
+    render();
+    setTimeout(() => { S.majEtat = "ok"; render(); toast("Tu es à jour · v1.0.0"); }, 1400);
+  }
+};
+
+function progresser(fin) {
+  const p = $("#prog");
+  if (!p) return;
+  p.classList.add("on");
+  const barre = p.querySelector("i");
+  let v = 0;
+  const it = setInterval(() => {
+    v += 12 + Math.random() * 18;
+    if (v >= 100) {
+      v = 100;
+      clearInterval(it);
+      setTimeout(fin, 180);
+    }
+    barre.style.width = v + "%";
+  }, 90);
+}
+
+function fmtDateCourte(d) {
+  return JOURS[d.getDay()] + " " + d.getDate() + " " + MOIS[d.getMonth()] + " à " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
+/* ---------- délégation d'événements ---------- */
+document.addEventListener("click", (ev) => {
+  const nav = ev.target.closest("[data-nav]");
+  if (nav) { S.ecran = nav.dataset.nav; S._scroll = 0; render(); return; }
+
+  const navClick = ev.target.closest("[data-nav-click]");
+  if (navClick) { S.ecran = navClick.dataset.navClick; S._scroll = 0; render(); return; }
+
+  const th = ev.target.closest("#btnTheme");
+  if (th) {
+    const html = document.documentElement;
+    const clair = html.dataset.theme === "dark";
+    html.dataset.theme = clair ? "light" : "dark";
+    th.textContent = clair ? "Thème sombre" : "Thème clair";
+    return;
+  }
+
+  const som = ev.target.closest("[data-sommeil]");
+  if (som) { S.form.sommeil = som.dataset.sommeil; render(); return; }
+
+  const rev = ev.target.closest("[data-reveil]");
+  if (rev) {
+    const d = parseInt(rev.dataset.reveil, 10);
+    S.form.reveils = Math.max(0, Math.min(9, S.form.reveils + d));
+    render(); return;
+  }
+
+  const rep = ev.target.closest("[data-repas]");
+  if (rep) { toggle(S.form.repas, rep.dataset.repas); render(); return; }
+
+  const sym = ev.target.closest("[data-sympt]");
+  if (sym) { toggle(S.form.symptomes, sym.dataset.sympt); render(); return; }
+
+  const loc = ev.target.closest("[data-loc]");
+  if (loc) { toggle(S.form.loc, loc.dataset.loc); render(); return; }
+
+  const act = ev.target.closest("[data-action]");
+  if (act && ACTIONS[act.dataset.action]) { ACTIONS[act.dataset.action](); return; }
+
+  const ed = ev.target.closest("[data-edit]");
+  if (ed) {
+    const e = DATA.find(x => x.id === ed.dataset.edit);
+    if (e) {
+      S.edition = e;
+      S.form = {
+        date: isoLocal(e.d), niveau: e.niveau, sommeil: e.sommeil, reveils: e.reveils,
+        repas: e.repas.slice(), symptomes: e.symptomes.slice(), loc: e.loc.slice(), com: e.com
+      };
+      S.ecran = "saisir";
+      render();
+      toast("Modification de la crise");
+    }
+  }
+});
+
+/* saisie live (les champs ne sont pas re-rendus pour ne pas perdre le focus) */
+document.addEventListener("input", (ev) => {
+  const t = ev.target;
+  if (t.id === "fNiveau") {
+    const v = parseInt(t.value, 10);
+    S.form.niveau = v;
+    const num = $("#lvlNum"), txt = $("#lvlTxt");
+    if (num) { num.textContent = v; num.style.color = couleurNiveau(v); }
+    if (txt) { txt.textContent = libelleNiveau(v); txt.style.color = couleurNiveau(v); }
+  }
+  if (t.id === "fDate") S.form.date = t.value;
+  if (t.id === "fCom") S.form.com = t.value;
+});
+
+/* ---------- horloge + flux vivant ---------- */
+function horloge() {
+  const d = new Date();
+  $("#horloge").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+setInterval(horloge, 15000);
+
+/* ---------- démarrage ---------- */
+horloge();
+render();
+S.ecran = "saisir";
+render();
+
+window.__app = {
+  rendus: () => _rendus,
+  count: () => DATA.length,
+  form: () => S.form,
+  ecran: () => S.ecran
+};
+</script>
+</body>
+</html>
