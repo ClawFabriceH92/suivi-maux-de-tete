@@ -56,8 +56,8 @@ android {
         applicationId = "com.trucdecomptable.mauxdetete"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
         resourceConfigurations += listOf("fr")
     }
 
@@ -119,6 +119,9 @@ dependencies {
 
     // Verrouillage biométrique
     implementation("androidx.biometric:biometric:1.1.0")
+
+    // Rappel du lendemain pour une crise encore ouverte
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 
     // Téléchargement de l'APK pour la mise à jour intégrée
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

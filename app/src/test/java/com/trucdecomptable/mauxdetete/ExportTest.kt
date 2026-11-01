@@ -64,6 +64,16 @@ class ExportTest {
     }
 
     @Test
+    fun csv_porte_les_quantites_de_medicaments() {
+        val avec = crise.copy(efferalganPrises = 2, efferalganMg = 1000, ibuprofenePrises = 1, ibuprofeneMg = 400)
+        val champs = ExportManager.construireCsv(listOf(avec), zone).lineSequence().toList()[1].split(";")
+        assertEquals("2", champs[16])
+        assertEquals("1000", champs[17])
+        assertEquals("1", champs[18])
+        assertEquals("400", champs[19])
+    }
+
+    @Test
     fun json_aller_retour_conserve_les_champs() {
         val texte = """{
             "application": "suivi-maux-de-tete",

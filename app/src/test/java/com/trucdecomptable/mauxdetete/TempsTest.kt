@@ -51,15 +51,27 @@ class TempsTest {
     }
 
     @Test
-    fun depasse_soiree_si_franchit_minuit_ou_six_heures() {
+    fun depasse_soiree_quand_minuit_est_franchi() {
         assertTrue(Temps.depasseSoiree(ms(2026, 11, 1, 20), ms(2026, 11, 2, 9), ms(2026, 11, 2, 10), zone))
-        assertTrue(Temps.depasseSoiree(ms(2026, 11, 1, 14), ms(2026, 11, 1, 20), ms(2026, 11, 1, 21), zone))
-        assertFalse(Temps.depasseSoiree(ms(2026, 11, 1, 8), ms(2026, 11, 1, 9), ms(2026, 11, 1, 10), zone))
     }
 
     @Test
-    fun crise_en_cours_depasse_toujours_la_soiree() {
-        assertTrue(Temps.depasseSoiree(ms(2026, 11, 1, 20), null, ms(2026, 11, 1, 21), zone))
+    fun depasse_soiree_quand_la_crise_finit_tard() {
+        assertTrue(Temps.depasseSoiree(ms(2026, 11, 1, 18), ms(2026, 11, 1, 23), ms(2026, 11, 1, 23), zone))
+        assertFalse(Temps.depasseSoiree(ms(2026, 11, 1, 18), ms(2026, 11, 1, 22), ms(2026, 11, 1, 22), zone))
+    }
+
+    @Test
+    fun six_heures_en_matine_ne_depassent_pas_la_soiree() {
+        val debut = ms(2026, 11, 1, 6)
+        val fin = ms(2026, 11, 1, 12)
+        assertFalse(Temps.depasseSoiree(debut, fin, fin, zone))
+        assertTrue(Temps.estLongue(debut, fin, fin))
+    }
+
+    @Test
+    fun crise_en_cours_ne_porte_pas_le_badge_soiree() {
+        assertFalse(Temps.depasseSoiree(ms(2026, 11, 1, 20), null, ms(2026, 11, 1, 21), zone))
     }
 
     @Test

@@ -170,7 +170,7 @@ private fun LigneCrise(crise: Crise, onClick: () -> Unit, onSupprimer: () -> Uni
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         val extras = mutableListOf<String>()
-        if (!crise.medicament.isNullOrBlank()) extras.add(crise.medicament!!)
+        crise.resumeMedicaments().takeIf { it.isNotBlank() }?.let { extras.add(it) }
         Crise.decouper(crise.declencheurs).take(2).forEach { extras.add(it.lowercase(Locale.FRANCE)) }
         Crise.decouper(crise.symptomes).take(2).forEach { extras.add(it.lowercase(Locale.FRANCE)) }
         if (extras.isNotEmpty()) {
@@ -257,8 +257,13 @@ fun EcranStats(crises: List<Crise>) {
             }
         }
 
-        Section("Crises longues") {
-            LigneStat("Ayant dépassé la soirée", "${bilan.crisesLongues}", couleur = couleurAlerte())
+        Section("Crises longues", "30 derniers jours") {
+            LigneStat(
+                "Crises de ${Temps.DUREE_LONGUE} h ou plus",
+                "${bilan.crisesLongues}",
+                couleur = couleurAlerte(),
+            )
+            LigneStat("Ayant dépassé la soirée", "${bilan.soireesDepassees}")
             LigneStat("Durée la plus longue", Temps.libelleDuree(bilan.dureeMaxHeures))
         }
 
@@ -270,6 +275,8 @@ fun EcranStats(crises: List<Crise>) {
                     "${Referentiels.SEUIL_TRIPTAN} j (triptan)",
                 couleur = if (bilan.medicamentsJours >= bilan.seuilMedicaments * 0.8) couleurAlerte() else null,
             )
+            LigneStat("Prises sur le mois", "${bilan.prisesMois}", detail = "Efferalgan et ibuprofène")
+            LigneStat("Dose cumulée", "${bilan.mgMois} mg")
             if (bilan.medicamentsJours >= bilan.seuilMedicaments * 0.8) {
                 Text(
                     "Proche du seuil de céphalée par abus médicamenteux : à évoquer avec ton médecin.",

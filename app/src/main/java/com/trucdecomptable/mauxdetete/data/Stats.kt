@@ -18,6 +18,7 @@ data class Bilan(
     val dureeMoyenneHeures: Double,
     val joursSansDouleur: Int,
     val crisesLongues: Int,
+    val soireesDepassees: Int,
     val dureeMaxHeures: Long,
     val parHeure: List<Int>,
     val parJourSemaine: List<Int>,
@@ -26,6 +27,8 @@ data class Bilan(
     val sommeilBon: Correlation,
     val sommeilMauvais: Correlation,
     val medicamentsJours: Int,
+    val prisesMois: Int,
+    val mgMois: Int,
     val seuilMedicaments: Int,
     val declencheurs: List<Frequence>,
     val repas: List<Frequence>,
@@ -58,7 +61,8 @@ object Stats {
             sur30.sumOf { Temps.dureeHeures(it.debutLe, it.finLe, maintenant) }.toDouble() / sur30.size
 
         val joursAvecDouleur = sur30.map { jourDe(it) }.distinct().size
-        val longues = sur30.count { Temps.depasseSoiree(it.debutLe, it.finLe, maintenant, zone) }
+        val longues = sur30.count { Temps.estLongue(it.debutLe, it.finLe, maintenant) }
+        val soirees = sur30.count { Temps.depasseSoiree(it.debutLe, it.finLe, maintenant, zone) }
         val dureeMax = sur30.maxOfOrNull { Temps.dureeHeures(it.debutLe, it.finLe, maintenant) } ?: 0L
 
         val parHeure = MutableList(24) { 0 }
@@ -82,8 +86,9 @@ object Stats {
             )
         }
 
-        val joursMedicament = mois.filter { !it.medicament.isNullOrBlank() }
-            .map { jourDe(it) }.distinct().size
+        val joursMedicament = mois.filter { it.aPrisQuelqueChose }.map { jourDe(it) }.distinct().size
+        val prises = mois.sumOf { it.efferalganPrises + it.ibuprofenePrises }
+        val mg = mois.sumOf { it.mgTotal }
         val seuil = if (mois.any { it.medicament == "Triptan" }) Referentiels.SEUIL_TRIPTAN
         else Referentiels.SEUIL_MEDICAMENT
 
@@ -93,6 +98,7 @@ object Stats {
             dureeMoyenneHeures = duree,
             joursSansDouleur = 30 - joursAvecDouleur,
             crisesLongues = longues,
+            soireesDepassees = soirees,
             dureeMaxHeures = dureeMax,
             parHeure = parHeure,
             parJourSemaine = parJour,
@@ -101,6 +107,8 @@ object Stats {
             sommeilBon = correlation(Referentiels.SOMMEIL_BON),
             sommeilMauvais = correlation(Referentiels.SOMMEIL_MAUVAIS),
             medicamentsJours = joursMedicament,
+            prisesMois = prises,
+            mgMois = mg,
             seuilMedicaments = seuil,
             declencheurs = frequences(crises) { Crise.decouper(it.declencheurs) },
             repas = frequences(crises) { Crise.decouper(it.repas) },

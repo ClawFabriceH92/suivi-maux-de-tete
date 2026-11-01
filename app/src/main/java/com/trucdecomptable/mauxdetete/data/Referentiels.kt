@@ -27,6 +27,16 @@ object Referentiels {
 
     val EFFICACITES = listOf("Soulagé", "Un peu", "Pas du tout")
 
+    /** Dosages proposés à la saisie, en milligrammes par prise. */
+    val EFFERALGAN_DOSAGES = listOf(500, 1000)
+    val IBUPROFENE_DOSAGES = listOf(200, 400)
+
+    const val EFFERALGAN_MG_DEFAUT = 1000
+    const val IBUPROFENE_MG_DEFAUT = 400
+
+    /** Nombre de prises maximum saisissable sur une crise. */
+    const val PRISES_MAX = 8
+
     const val SOMMEIL_BON = "bon"
     const val SOMMEIL_MOYEN = "moyen"
     const val SOMMEIL_MAUVAIS = "mauvais"

@@ -28,6 +28,10 @@ data class Formulaire(
     val medicament: String? = null,
     val efficacite: String? = null,
     val commentaire: String = "",
+    val efferalganPrises: Int = 0,
+    val efferalganMg: Int = Referentiels.EFFERALGAN_MG_DEFAUT,
+    val ibuprofenePrises: Int = 0,
+    val ibuprofeneMg: Int = Referentiels.IBUPROFENE_MG_DEFAUT,
 ) {
 
     val debutMs: Long
@@ -75,6 +79,10 @@ data class Formulaire(
         efficacite = efficacite,
         commentaire = commentaire,
         creeLe = creeLe,
+        efferalganPrises = efferalganPrises,
+        efferalganMg = efferalganMg,
+        ibuprofenePrises = ibuprofenePrises,
+        ibuprofeneMg = ibuprofeneMg,
     )
 
     companion object {
@@ -101,6 +109,10 @@ data class Formulaire(
                 medicament = crise.medicament,
                 efficacite = crise.efficacite,
                 commentaire = crise.commentaire,
+                efferalganPrises = crise.efferalganPrises,
+                efferalganMg = crise.efferalganMg,
+                ibuprofenePrises = crise.ibuprofenePrises,
+                ibuprofeneMg = crise.ibuprofeneMg,
             )
         }
     }

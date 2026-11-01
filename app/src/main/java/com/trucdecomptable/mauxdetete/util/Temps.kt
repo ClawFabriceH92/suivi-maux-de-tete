@@ -11,7 +11,11 @@ import java.time.ZoneId
  */
 object Temps {
 
-    const val HEURES_SOIREE = 6
+    /** Heure à partir de laquelle on considère que la crise a tenu la soirée. */
+    const val HEURE_SOIREE = 23
+
+    /** Durée à partir de laquelle une crise est dite longue (statistique). */
+    const val DUREE_LONGUE = 6
 
     fun dureeHeures(debutMs: Long, finMs: Long?, maintenantMs: Long): Long {
         val fin = finMs ?: maintenantMs
@@ -27,15 +31,28 @@ object Temps {
         return jourLocal(debutMs, zone) != jourLocal(finMs, zone)
     }
 
+    fun heureLocale(ms: Long, zone: ZoneId = ZoneId.systemDefault()): Int =
+        Instant.ofEpochMilli(ms).atZone(zone).hour
+
+    /** Crise de six heures ou plus. C'est une durée, pas un horaire. */
+    fun estLongue(debutMs: Long, finMs: Long?, maintenantMs: Long): Boolean =
+        dureeHeures(debutMs, finMs, maintenantMs) >= DUREE_LONGUE
+
+    /**
+     * « A dépassé la soirée » ne parle que de l'horaire : la crise a franchi
+     * minuit, ou s'est terminée à 23h ou plus tard. Une durée de six heures en
+     * pleine matinée (6h → 12h) n'a rien à voir avec la soirée et ne doit pas
+     * porter ce badge.
+     */
     fun depasseSoiree(
         debutMs: Long,
         finMs: Long?,
-        maintenantMs: Long,
+        @Suppress("UNUSED_PARAMETER") maintenantMs: Long,
         zone: ZoneId = ZoneId.systemDefault(),
     ): Boolean {
-        if (finMs == null) return true
+        if (finMs == null) return false
         if (franchitMinuit(debutMs, finMs, zone)) return true
-        return dureeHeures(debutMs, finMs, maintenantMs) >= HEURES_SOIREE
+        return heureLocale(finMs, zone) >= HEURE_SOIREE
     }
 
     /** « 13 h », « moins d'1 h », et pour les crises en cours « 3 h (en cours) ». */

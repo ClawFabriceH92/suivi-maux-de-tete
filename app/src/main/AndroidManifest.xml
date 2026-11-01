@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -26,6 +27,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Boutons de la notification du lendemain : clôturer ou repousser. -->
+        <receiver
+            android:name=".sync.RappelActions"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.trucdecomptable.mauxdetete.TERMINER" />
+                <action android:name="com.trucdecomptable.mauxdetete.REPLANIFIER" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name="androidx.core.content.FileProvider"

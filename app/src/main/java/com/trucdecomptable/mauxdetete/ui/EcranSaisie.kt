@@ -208,7 +208,43 @@ fun EcranSaisie(
                 }
             }
 
-            Section("Médicament pris") {
+            Section("Médicaments", "quantités prises") {
+                LigneMedicament(
+                    nom = "Efferalgan",
+                    prises = f.efferalganPrises,
+                    dosage = f.efferalganMg,
+                    dosages = Referentiels.EFFERALGAN_DOSAGES,
+                    onPrises = { v -> vm.modifier { it.copy(efferalganPrises = v) } },
+                    onDosage = { v -> vm.modifier { it.copy(efferalganMg = v) } },
+                )
+                Spacer(Modifier.height(14.dp))
+                LigneMedicament(
+                    nom = "Ibuprofène",
+                    prises = f.ibuprofenePrises,
+                    dosage = f.ibuprofeneMg,
+                    dosages = Referentiels.IBUPROFENE_DOSAGES,
+                    onPrises = { v -> vm.modifier { it.copy(ibuprofenePrises = v) } },
+                    onDosage = { v -> vm.modifier { it.copy(ibuprofeneMg = v) } },
+                )
+
+                val totalMg = f.efferalganPrises * f.efferalganMg + f.ibuprofenePrises * f.ibuprofeneMg
+                if (totalMg > 0) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Total sur cette crise : $totalMg mg",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+
+                Spacer(Modifier.height(14.dp))
+                Text(
+                    "Autre médicament (triptan, autre)",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(6.dp))
                 ChoixUnique(Referentiels.MEDICAMENTS, f.medicament) { v ->
                     vm.modifier { it.copy(medicament = if (it.medicament == v) null else v) }
                 }
@@ -222,8 +258,8 @@ fun EcranSaisie(
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Seuil d'alerte : ${Referentiels.SEUIL_MEDICAMENT} jours par mois pour un antalgique simple, " +
-                        "${Referentiels.SEUIL_TRIPTAN} jours pour un triptan.",
+                    "Seuil d'alerte : ${Referentiels.SEUIL_MEDICAMENT} jours par mois avec un antalgique, " +
+                        "${Referentiels.SEUIL_TRIPTAN} jours avec un triptan.",
                     fontSize = 10.5.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -308,6 +344,60 @@ fun SelecteurHeure(libelle: String, heure: Int, actif: Boolean = true, onChoix: 
                         onChoix(h)
                         ouvert = false
                     },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Une molécule : nombre de prises et dosage unitaire. Deux taps suffisent en
+ * pleine crise, sans clavier.
+ */
+@Composable
+fun LigneMedicament(
+    nom: String,
+    prises: Int,
+    dosage: Int,
+    dosages: List<Int>,
+    onPrises: (Int) -> Unit,
+    onDosage: (Int) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(nom, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+            TextButton(onClick = { onPrises((prises - 1).coerceAtLeast(0)) }) {
+                Text("−", fontSize = 20.sp)
+            }
+            Text(
+                prises.toString(),
+                fontWeight = FontWeight.Black,
+                fontSize = 17.sp,
+                modifier = Modifier.width(22.dp),
+            )
+            TextButton(onClick = { onPrises((prises + 1).coerceAtMost(Referentiels.PRISES_MAX)) }) {
+                Text("+", fontSize = 20.sp)
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Dosage", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.width(6.dp))
+            dosages.forEach { d ->
+                TextButton(onClick = { onDosage(d) }) {
+                    Text(
+                        if (d >= 1000) "${d / 1000} g" else "$d mg",
+                        fontWeight = if (d == dosage) FontWeight.Black else FontWeight.Normal,
+                        color = if (d == dosage) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+            if (prises > 0) {
+                Text(
+                    "= ${prises * dosage} mg",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }

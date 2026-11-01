@@ -49,6 +49,7 @@ object ExportManager {
             "date_debut", "heure_debut", "date_fin", "heure_fin", "duree_heures", "depasse_soiree",
             "niveau", "sommeil", "reveils", "declencheurs", "repas", "symptomes", "localisations",
             "medicament", "efficacite", "commentaire",
+            "efferalgan_prises", "efferalgan_mg", "ibuprofene_prises", "ibuprofene_mg",
         )
         val lignes = mutableListOf(entete.joinToString(";"))
         crises.sortedBy { it.debutLe }.forEach { c ->
@@ -72,6 +73,10 @@ object ExportManager {
                 c.medicament.orEmpty(),
                 c.efficacite.orEmpty(),
                 c.commentaire.replace("\n", " ").replace(";", ","),
+                c.efferalganPrises.toString(),
+                c.efferalganMg.toString(),
+                c.ibuprofenePrises.toString(),
+                c.ibuprofeneMg.toString(),
             ).joinToString(";")
         }
         return lignes.joinToString("\r\n")
@@ -101,6 +106,10 @@ object ExportManager {
                     .put("medicament", c.medicament ?: JSONObject.NULL)
                     .put("efficacite", c.efficacite ?: JSONObject.NULL)
                     .put("commentaire", c.commentaire)
+                    .put("efferalgan_prises", c.efferalganPrises)
+                    .put("efferalgan_mg", c.efferalganMg)
+                    .put("ibuprofene_prises", c.ibuprofenePrises)
+                    .put("ibuprofene_mg", c.ibuprofeneMg)
                     .put("cree_le", c.creeLe),
             )
         }
@@ -134,6 +143,10 @@ object ExportManager {
                 efficacite = if (o.isNull("efficacite")) null else o.optString("efficacite"),
                 commentaire = o.optString("commentaire", ""),
                 creeLe = o.optLong("cree_le", System.currentTimeMillis()),
+                efferalganPrises = o.optInt("efferalgan_prises", 0),
+                efferalganMg = o.optInt("efferalgan_mg", Referentiels.EFFERALGAN_MG_DEFAUT),
+                ibuprofenePrises = o.optInt("ibuprofene_prises", 0),
+                ibuprofeneMg = o.optInt("ibuprofene_mg", Referentiels.IBUPROFENE_MG_DEFAUT),
             )
         }
         return crises
@@ -176,6 +189,7 @@ object ExportManager {
             "Crises ayant dépassé la soirée : ${bilan.crisesLongues}",
             "Jours avec médicament ce mois : ${bilan.medicamentsJours} " +
                 "(seuil ${bilan.seuilMedicaments} j, ICHD-3)",
+            "Prises ce mois : ${bilan.prisesMois} · dose cumulée ${bilan.mgMois} mg",
         ).forEach { ligne ->
             toile.drawText(ligne, 48f, y, normal)
             y += 15f
@@ -222,7 +236,7 @@ object ExportManager {
                 "${debut.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM"))} " +
                     "${debut.toLocalTime().format(HEURE)}$fin · ${duree} h · " +
                     "${c.niveau}/10 · ${Referentiels.libelleSommeil(c.sommeil)}" +
-                    (c.medicament?.let { " · $it" } ?: ""),
+                    (c.resumeMedicaments().takeIf { it.isNotBlank() }?.let { " · $it" } ?: ""),
                 48f, y, petit,
             )
             y += 13f

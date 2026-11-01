@@ -12,6 +12,7 @@ import com.trucdecomptable.mauxdetete.data.Reglages
 import com.trucdecomptable.mauxdetete.data.Stats
 import com.trucdecomptable.mauxdetete.export.ExportManager
 import com.trucdecomptable.mauxdetete.export.FichierExport
+import com.trucdecomptable.mauxdetete.sync.Rappels
 import com.trucdecomptable.mauxdetete.util.Diag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -68,10 +69,15 @@ class CriseViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             if (f.id != null) {
                 val existante = crises.value.firstOrNull { it.id == f.id }
-                dao.mettreAJour(f.versCrise(creeLe = existante?.creeLe ?: System.currentTimeMillis()))
+                val crise = f.versCrise(creeLe = existante?.creeLe ?: System.currentTimeMillis())
+                dao.mettreAJour(crise)
+                if (f.enCours) Rappels.programmer(getApplication(), crise.id)
+                else Rappels.annuler(getApplication(), crise.id)
                 message = "Crise mise à jour"
             } else {
-                dao.inserer(f.versCrise())
+                val id = dao.inserer(f.versCrise())
+                // Crise ouverte : on demande le lendemain si elle est terminée.
+                if (f.enCours) Rappels.programmer(getApplication(), id)
                 message = "Crise enregistrée · ${f.dureeHeures} h"
             }
             formulaire = Formulaire()
@@ -83,7 +89,7 @@ class CriseViewModel(application: Application) : AndroidViewModel(application) {
     fun demarrerMaintenant() {
         val maintenant = System.currentTimeMillis()
         viewModelScope.launch {
-            dao.inserer(
+            val id = dao.inserer(
                 Crise(
                     debutLe = maintenant - (maintenant % 3_600_000L),
                     finLe = null,
@@ -91,19 +97,22 @@ class CriseViewModel(application: Application) : AndroidViewModel(application) {
                     sommeil = com.trucdecomptable.mauxdetete.data.Referentiels.SOMMEIL_MOYEN,
                 ),
             )
-            message = "Crise démarrée · à clôturer quand ça se termine"
+            Rappels.programmer(getApplication(), id)
+            message = "Crise démarrée · rappel demain matin"
         }
     }
 
     fun cloturer(crise: Crise) {
         viewModelScope.launch {
             dao.mettreAJour(crise.copy(finLe = System.currentTimeMillis()))
+            Rappels.annuler(getApplication(), crise.id)
             message = "Crise clôturée"
         }
     }
 
     fun supprimer(crise: Crise, onFini: () -> Unit = {}) {
         viewModelScope.launch {
+            Rappels.annuler(getApplication(), crise.id)
             dao.supprimer(crise.id)
             message = "Crise supprimée"
             onFini()
