@@ -90,15 +90,24 @@ fun EcranSaisie(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(10.dp))
-                Button(
-                    onClick = { vm.cloturer(criseEnCours) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF0A52B)),
-                ) {
-                    Text("Clôturer maintenant", color = Color(0xFF20160A), fontWeight = FontWeight.Bold)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = { vm.editer(criseEnCours) },
+                        modifier = Modifier.weight(1f).height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    ) { Text("Modifier", fontWeight = FontWeight.Bold) }
+                    Button(
+                        onClick = { vm.cloturer(criseEnCours) },
+                        modifier = Modifier.weight(1.4f).height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF0A52B)),
+                    ) {
+                        Text("Clôturer maintenant", color = Color(0xFF20160A), fontWeight = FontWeight.Bold)
+                    }
                 }
             }
             Spacer(Modifier.height(10.dp))
@@ -138,7 +147,8 @@ fun EcranSaisie(
                 Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Se termine à", fontSize = 12.sp, modifier = Modifier.weight(1f))
-                    (1..3).forEach { n ->
+                    val options = ((1..3) + if (f.decalageJours > 3) listOf(f.decalageJours) else emptyList()).distinct()
+                    options.forEach { n ->
                         TextButton(onClick = { vm.modifier { it.copy(decalageJours = n) } }) {
                             Text(
                                 "J+$n",

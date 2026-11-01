@@ -56,6 +56,15 @@ fun Racine(vm: CriseViewModel) {
         }
     }
 
+    // Le réglage « sauvegarde automatique » doit produire un effet : un JSON
+    // écrit une fois par mois, sans ouvrir le sélecteur de partage.
+    LaunchedEffect(crises.size) {
+        if (vm.sauvegardeAutoDue()) {
+            vm.exporter(Sortie.JSON, partager = false)
+            vm.marquerSauvegarde()
+        }
+    }
+
     // Un contrôle au lancement, puis toutes les 30 minutes : le plancher horaire
     // est tenu dans le manager, donc les réveils fréquents ne coûtent qu'un appel.
     LaunchedEffect(Unit) {

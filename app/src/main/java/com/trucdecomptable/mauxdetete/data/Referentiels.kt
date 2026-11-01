@@ -23,7 +23,12 @@ object Referentiels {
         "Les deux côtés", "Autour des yeux",
     )
 
-    val MEDICAMENTS = listOf("Paracétamol", "AINS / ibuprofène", "Triptan", "Autre")
+    /**
+     * Seuls les autres traitements : l'Efferalgan et l'ibuprofène ont leurs
+     * propres compteurs de prises, les remettre ici ferait saisir deux fois la
+     * même chose.
+     */
+    val MEDICAMENTS = listOf("Triptan", "Autre")
 
     val EFFICACITES = listOf("Soulagé", "Un peu", "Pas du tout")
 

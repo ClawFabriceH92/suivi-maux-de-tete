@@ -129,7 +129,7 @@ class CriseViewModel(application: Application) : AndroidViewModel(application) {
 
     // ----------------------------------------------------------- exports
 
-    fun exporter(sortie: Sortie) {
+    fun exporter(sortie: Sortie, partager: Boolean = true) {
         val app = getApplication<Application>()
         viewModelScope.launch {
             val liste = crises.value
@@ -148,7 +148,8 @@ class CriseViewModel(application: Application) : AndroidViewModel(application) {
             }
             resultat.onSuccess {
                 fichierSauvegarde = it
-                partage = it
+                // Une sauvegarde automatique ne doit pas ouvrir le sélecteur de partage.
+                if (partager) partage = it
                 Diag.record("export", "${it.nom} (${it.description})")
             }.onFailure {
                 Diag.record("export", it)
@@ -175,8 +176,13 @@ class CriseViewModel(application: Application) : AndroidViewModel(application) {
             val resultat = runCatching { ExportManager.lireJson(texte) }
             resultat.onSuccess { liste ->
                 withContext(Dispatchers.IO) {
+                    Rappels.annulerTout(getApplication())
                     dao.toutSupprimer()
                     dao.insererTout(liste.map { it.copy(id = 0) })
+                }
+                // Une crise encore ouverte dans la sauvegarde doit retrouver son rappel.
+                dao.toutesMaintenant().firstOrNull { it.finLe == null }?.let { ouverte ->
+                    Rappels.programmer(getApplication(), ouverte.id)
                 }
                 message = "Sauvegarde restaurée · ${liste.size} crises"
                 Diag.record("restauration", "${liste.size} crises")

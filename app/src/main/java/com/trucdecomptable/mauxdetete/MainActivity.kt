@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.fragment.app.FragmentActivity
 import com.trucdecomptable.mauxdetete.data.Reglages
+import com.trucdecomptable.mauxdetete.sync.NotificationsCrise
 import com.trucdecomptable.mauxdetete.ui.CriseViewModel
 import com.trucdecomptable.mauxdetete.ui.EcranVerrouillage
 import com.trucdecomptable.mauxdetete.ui.MauxDeTeteTheme
@@ -31,6 +32,7 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        NotificationsCrise.creerCanal(this)
         demanderPermissionNotifications()
         val reglages = Reglages(this)
         setContent {

@@ -69,7 +69,9 @@ object Stats {
         sur30.forEach { parHeure[Instant.ofEpochMilli(it.debutLe).atZone(zone).hour] += 1 }
 
         val parJour = MutableList(7) { 0 }
-        sur30.forEach { parJour[jourDe(it).dayOfWeek.value % 7] += 1 }
+        // dayOfWeek.value va de 1 (lundi) à 7 (dimanche) : on décale pour que
+        // la première barre de l'écran corresponde bien à « lun ».
+        sur30.forEach { parJour[jourDe(it).dayOfWeek.value - 1] += 1 }
 
         val ilYa7 = aujourdHui.minusDays(6)
         val ilYa14 = aujourdHui.minusDays(13)
@@ -78,8 +80,9 @@ object Stats {
             !jourDe(it).isBefore(ilYa14) && jourDe(it).isBefore(ilYa7)
         }
 
+        // Même période que l'intensité moyenne affichée à côté : 30 derniers jours.
         fun correlation(valeur: String): Correlation {
-            val lot = crises.filter { it.sommeil == valeur }
+            val lot = sur30.filter { it.sommeil == valeur }
             return Correlation(
                 moyenne = if (lot.isEmpty()) null else lot.sumOf { it.niveau }.toDouble() / lot.size,
                 effectif = lot.size,

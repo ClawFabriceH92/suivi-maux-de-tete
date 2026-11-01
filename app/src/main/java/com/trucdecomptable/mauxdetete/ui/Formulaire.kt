@@ -90,8 +90,10 @@ data class Formulaire(
             val zone = ZoneId.systemDefault()
             val debut = java.time.Instant.ofEpochMilli(crise.debutLe).atZone(zone)
             val fin = crise.finLe?.let { java.time.Instant.ofEpochMilli(it).atZone(zone) }
+            // Pas de plafond à 3 : une sauvegarde importée peut porter un décalage
+            // plus long, le ramener à 3 fausserait la crise à la modification.
             val decalage = if (fin == null) 1
-            else ((fin.toLocalDate().toEpochDay() - debut.toLocalDate().toEpochDay()).toInt()).coerceIn(1, 3)
+            else (fin.toLocalDate().toEpochDay() - debut.toLocalDate().toEpochDay()).toInt().coerceAtLeast(1)
             return Formulaire(
                 id = crise.id,
                 jour = debut.toLocalDate(),

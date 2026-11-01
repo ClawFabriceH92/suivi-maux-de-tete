@@ -160,6 +160,7 @@ private fun LigneCrise(crise: Crise, onClick: () -> Unit, onSupprimer: () -> Uni
             Temps.libelleDuree(heures),
             "sommeil " + Referentiels.libelleSommeil(crise.sommeil).lowercase(Locale.FRANCE),
         )
+        if (crise.reveils > 0) morceaux.add("${crise.reveils} réveil" + if (crise.reveils > 1) "s" else "")
         if (lendemain) morceaux.add("lendemain")
         if (Temps.depasseSoiree(crise.debutLe, crise.finLe, System.currentTimeMillis(), zone)) {
             morceaux.add("soirée dépassée")

@@ -26,7 +26,7 @@ object Rappels {
         maintenant: LocalDateTime = LocalDateTime.now(),
         heure: Int = HEURE_RAPPEL,
     ): Duration {
-        val cible = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(heure, 0))
+        val cible = LocalDateTime.of(maintenant.toLocalDate().plusDays(1), LocalTime.of(heure, 0))
         val delai = Duration.between(maintenant, cible)
         return if (delai.isNegative) Duration.ZERO else delai
     }
@@ -52,5 +52,10 @@ object Rappels {
     fun annuler(context: Context, criseId: Long) {
         WorkManager.getInstance(context).cancelUniqueWork(PREFIXE + criseId)
         NotificationsCrise.annuler(context, criseId)
+    }
+
+    /** Après une restauration, les identifiants changent : on repart de zéro. */
+    fun annulerTout(context: Context) {
+        WorkManager.getInstance(context).cancelAllWork()
     }
 }

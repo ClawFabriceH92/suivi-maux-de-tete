@@ -11,6 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.trucdecomptable.mauxdetete.MainActivity
 import com.trucdecomptable.mauxdetete.R
 import com.trucdecomptable.mauxdetete.data.Crise
+import com.trucdecomptable.mauxdetete.util.Diag
 import com.trucdecomptable.mauxdetete.util.Temps
 
 /**
@@ -76,7 +77,12 @@ object NotificationsCrise {
 
         runCatching {
             NotificationManagerCompat.from(context).notify(idNotification(crise.id), notification)
-        }
+        }.onFailure { Diag.record("notification", it) }
+            .onSuccess {
+                if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+                    Diag.record("notification", "notifications désactivées par l'utilisateur")
+                }
+            }
     }
 
     private fun action(context: Context, criseId: Long, action: String, code: Int): PendingIntent {
