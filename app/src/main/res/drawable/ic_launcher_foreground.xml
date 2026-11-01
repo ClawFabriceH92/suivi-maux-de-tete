@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Tête de profil stylisée -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,30 C64.5,30 73,38.5 73,49 C73,56 69,60.5 66,64 L66,70 C66,72.2 64.2,74 62,74 L46,74 C43.8,74 42,72.2 42,70 L42,64 C39,60.5 35,56 35,49 C35,38.5 43.5,30 54,30 Z" />
+
+    <!-- Éclair de douleur -->
+    <path
+        android:fillColor="#5B6CFF"
+        android:pathData="M57,36 L47,51 L53.5,51 L50,64 L62,47 L54.5,47 Z" />
+
+    <!-- Ondes de douleur -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M29,42 C26,46 26,52 29,56" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M79,42 C82,46 82,52 79,56" />
+</vector>
