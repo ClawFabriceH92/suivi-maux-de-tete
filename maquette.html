@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Maquette · Suivi des maux de tête</title>
+<title>Maquette v2 · Suivi des maux de tête</title>
 <style>
   :root{
     --bg:#0b0d13; --panel:#141824; --panel2:#1b2130; --line:#2a3244; --fg:#eef2ff; --dim:#8b97ad;
     --accent:#5b6cff; --accent-soft:#5b6cff22;
-    --ok:#2fbf71; --warn:#f0a52b; --bad:#ef4d5a; --mid:#f28c28;
+    --ok:#2fbf71; --warn:#f0a52b; --bad:#ef4d5a;
     --n0:#2fbf71; --n1:#79c94a; --n2:#d7c62c; --n3:#f0a52b; --n4:#f28c28; --n5:#ef4d5a; --n6:#c22a3a;
     --shadow:0 30px 70px rgba(0,0,0,.55);
   }
@@ -17,118 +17,100 @@
     --accent:#4353e8; --accent-soft:#4353e814;
     --shadow:0 26px 60px rgba(24,35,66,.20);
   }
+  html[data-theme="light"] .phone{background:#fff}
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--fg); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    min-height:100vh; transition:background .25s,color .25s;
-  }
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;transition:background .25s,color .25s}
   .wrap{max-width:1180px;margin:0 auto;padding:26px 20px 40px}
   .head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:20px}
   .head h1{font-size:20px;margin:0 0 6px}
-  .head p{margin:0;color:var(--dim);font-size:13.5px;max-width:640px;line-height:1.5}
-  .btn-theme{
-    background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:10px;
-    padding:9px 14px;font-size:13px;cursor:pointer;font-weight:600
-  }
+  .head p{margin:0;color:var(--dim);font-size:13.5px;max-width:660px;line-height:1.5}
+  .btn-theme{background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13px;cursor:pointer;font-weight:600}
   .layout{display:flex;gap:34px;align-items:flex-start;flex-wrap:wrap}
-  .phone{
-    width:390px;height:844px;background:var(--panel);border-radius:44px;border:1px solid var(--line);
-    box-shadow:var(--shadow);position:relative;overflow:hidden;display:flex;flex-direction:column;flex:0 0 auto
-  }
-  .statusbar{
-    height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
-    padding:0 24px;font-size:12.5px;font-weight:600;color:var(--fg)
-  }
+  .phone{width:390px;height:844px;background:var(--panel);border-radius:44px;border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden;display:flex;flex-direction:column;flex:0 0 auto}
+  .statusbar{height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:12.5px;font-weight:600}
   .statusbar .icons{display:flex;gap:6px;align-items:center;opacity:.85}
-  .content{flex:1 1 auto;overflow-y:auto;padding:2px 18px 16px;scrollbar-width:thin}
+  .content{flex:1 1 auto;overflow-y:auto;padding:2px 18px 16px}
   .content::-webkit-scrollbar{width:0}
-  .nav{
-    flex:0 0 auto;height:66px;border-top:1px solid var(--line);background:var(--panel2);
-    display:grid;grid-template-columns:repeat(4,1fr);align-items:center
-  }
-  .nav button{
-    background:none;border:0;color:var(--dim);display:flex;flex-direction:column;align-items:center;gap:3px;
-    font-size:10.5px;font-weight:600;cursor:pointer;padding:6px 0;font-family:inherit
-  }
+  .nav{flex:0 0 auto;height:66px;border-top:1px solid var(--line);background:var(--panel2);display:grid;grid-template-columns:repeat(4,1fr);align-items:center}
+  .nav button{background:none;border:0;color:var(--dim);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;cursor:pointer;padding:6px 0;font-family:inherit}
   .nav button.on{color:var(--accent)}
   .nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-  .toast{
-    position:absolute;left:16px;right:16px;bottom:82px;background:var(--fg);color:var(--panel);
-    padding:11px 14px;border-radius:12px;font-size:12.5px;font-weight:600;text-align:center;
-    opacity:0;transform:translateY(10px);transition:.22s;pointer-events:none;z-index:5
-  }
+  .toast{position:absolute;left:16px;right:16px;bottom:82px;background:var(--fg);color:var(--panel);padding:11px 14px;border-radius:12px;font-size:12.5px;font-weight:600;text-align:center;opacity:0;transform:translateY(10px);transition:.22s;pointer-events:none;z-index:5}
   .toast.show{opacity:1;transform:translateY(0)}
 
-  /* écrans */
   .h2{font-size:17px;font-weight:700;margin:10px 0 2px}
-  .sub{font-size:12px;color:var(--dim);margin:0 0 14px}
+  .sub{font-size:12px;color:var(--dim);margin:0 0 12px}
   .card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
   .card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
   .card-h .lbl{font-size:12.5px;font-weight:700;letter-spacing:.02em}
   .hint{font-size:11px;color:var(--dim)}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{
-    border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;
-    padding:8px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;font-weight:600;transition:.15s
-  }
+  .chip{border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:8px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;font-weight:600;transition:.15s}
   .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
   .chip.sm{padding:6px 10px;font-size:11.5px;font-weight:600}
-  input[type=date],input[type=text],textarea,select{
-    background:var(--panel);border:1px solid var(--line);border-radius:11px;color:var(--fg);
-    padding:10px 12px;font-size:13px;font-family:inherit;outline:none
-  }
+  .chip.big{padding:12px 16px;font-size:14px;border-radius:14px;min-height:48px}
+  input[type=date],textarea,select{background:var(--panel);border:1px solid var(--line);border-radius:11px;color:var(--fg);padding:10px 12px;font-size:13px;font-family:inherit;outline:none}
   input[type=date]{flex:1 1 128px;min-width:0}
   select{min-width:76px;cursor:pointer;font-weight:700;font-variant-numeric:tabular-nums}
   select:disabled{opacity:.4}
-  textarea{width:100%;min-height:64px;resize:none}
+  textarea{width:100%;min-height:62px;resize:none}
   .arrow{color:var(--dim);font-weight:700}
-  .plage{
-    margin-top:10px;font-size:12.5px;font-weight:700;color:var(--fg);
-    background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:10px;
-    padding:9px 11px;line-height:1.45
-  }
-  .lvl{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
-  .lvl b{font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
-  .lvl span{font-size:12.5px;font-weight:700}
-  input[type=range]{-webkit-appearance:none;width:100%;height:26px;background:transparent}
-  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:6px;background:linear-gradient(90deg,#2fbf71,#79c94a,#d7c62c,#f0a52b,#f28c28,#ef4d5a,#c22a3a)}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--panel);box-shadow:0 2px 8px rgba(0,0,0,.4);margin-top:-7px}
-  .scale{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:-2px}
-  .stepper{display:flex;align-items:center;gap:10px}
-  .stepper button{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:16px;cursor:pointer;font-weight:700}
-  .stepper b{font-size:14px;min-width:22px;text-align:center}
-  .cta{
-    width:100%;border:0;border-radius:14px;background:var(--accent);color:#fff;padding:14px;
-    font-size:14.5px;font-weight:700;cursor:pointer;margin-top:4px;font-family:inherit
-  }
-  .cta.ghost{background:transparent;border:1px solid var(--line);color:var(--fg);margin-top:8px}
-  .cta:disabled{opacity:.5;cursor:default}
+  .plage{margin-top:10px;font-size:12.5px;font-weight:700;color:var(--fg);background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:10px;padding:9px 11px;line-height:1.45}
 
-  /* historique */
+  .encours{background:#f0a52b1f;border:1px solid #f0a52b66;border-radius:16px;padding:12px 14px;margin-bottom:12px}
+  .encours b{font-size:13.5px}
+  .encours .sub2{font-size:11.5px;color:var(--dim);margin-top:2px}
+  .btn-clot{width:100%;margin-top:10px;border:0;border-radius:12px;background:var(--warn);color:#20160a;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;min-height:48px}
+
+  .lvl{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+  .lvl b{font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+  .lvl span{font-size:13px;font-weight:700}
+  input[type=range]{-webkit-appearance:none;width:100%;height:34px;background:transparent}
+  input[type=range]::-webkit-slider-runnable-track{height:12px;border-radius:8px;background:linear-gradient(90deg,#2fbf71,#79c94a,#d7c62c,#f0a52b,#f28c28,#ef4d5a,#c22a3a)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#fff;border:3px solid var(--panel);box-shadow:0 2px 8px rgba(0,0,0,.45);margin-top:-8px}
+  .scale{display:flex;justify-content:space-between;font-size:10px;color:var(--dim)}
+  .stepper{display:flex;align-items:center;gap:10px}
+  .stepper button{width:40px;height:40px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:18px;cursor:pointer;font-weight:700}
+  .stepper b{font-size:15px;min-width:24px;text-align:center}
+  .cta{width:100%;border:0;border-radius:14px;background:var(--accent);color:#fff;padding:15px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;font-family:inherit;min-height:50px}
+  .cta.ghost{background:transparent;border:1px solid var(--line);color:var(--fg);margin-top:8px}
+  .cta.big{font-size:16px;min-height:56px}
+
+  details.sec{background:var(--panel2);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden}
+  details.sec>summary{cursor:pointer;padding:14px;font-size:12.5px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:48px}
+  details.sec>summary::-webkit-details-marker{display:none}
+  details.sec>summary::after{content:"+";font-size:17px;color:var(--dim);font-weight:700}
+  details.sec[open]>summary::after{content:"–"}
+  details.sec>summary .cnt{font-size:11px;color:var(--accent);font-weight:700;margin-left:8px}
+  details.sec .body{padding:0 14px 14px}
+
   .mois{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--dim);text-transform:uppercase;margin:14px 0 8px}
-  .item{display:flex;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
+  .item{display:flex;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:8px;cursor:pointer;min-height:60px}
   .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
   .item .d1{font-size:13px;font-weight:700}
   .item .d2{font-size:11.5px;color:var(--dim);margin-top:2px;line-height:1.4}
   .item .niv{margin-left:auto;text-align:right;font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
-  .item .niv small{display:block;font-size:9.5px;font-weight:700;color:var(--dim);letter-spacing:.04em}
+  .item .niv small{display:block;font-size:9.5px;font-weight:700;color:var(--dim)}
   .tag{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:#f0a52b22;color:var(--warn);margin-left:6px;vertical-align:1px}
+  .tag.med{background:#ef4d5a22;color:var(--bad)}
   .empty{color:var(--dim);font-size:13px;text-align:center;padding:40px 10px;line-height:1.6}
 
-  /* stats */
   .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
   .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:13px}
   .kpi .v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
   .kpi .k{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.35}
-  .bars{display:flex;align-items:flex-end;gap:3px;height:104px;padding-top:6px}
-  .bars i{flex:1;border-radius:3px 3px 0 0;min-height:3px;display:block}
+  .bars{display:flex;align-items:flex-end;gap:3px;height:100px;padding-top:6px}
+  .bars i{flex:1;border-radius:3px 3px 0 0;min-height:3px;display:block;background:var(--accent)}
+  .bars.h24{gap:2px}
+  .bars.h7{gap:8px}
   .legend{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:6px}
-  .corr{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--line)}
+  .corr{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--line)}
   .corr:last-child{border-bottom:0}
-  .corr b{font-variant-numeric:tabular-nums}
+  .corr b{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .corr .n{color:var(--dim);font-size:11px;font-weight:600}
+  .faible{font-size:11px;color:var(--warn);margin-top:8px;line-height:1.4}
 
-  /* export */
   .file{display:flex;align-items:center;gap:10px;font-size:12px;padding:9px 0;border-bottom:1px solid var(--line)}
   .file:last-child{border-bottom:0}
   .file .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -136,20 +118,19 @@
   .prog{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:10px;display:none}
   .prog.on{display:block}
   .prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .18s}
-  .maj{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px}
+  .maj{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;padding:7px 0}
   .pill{font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
   .pill.ok{background:#2fbf7122;color:var(--ok)}
+  .pill.warn{background:#f0a52b22;color:var(--warn)}
+  .switch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;font-size:12.5px;border-bottom:1px solid var(--line)}
+  .switch:last-child{border-bottom:0}
+  .switch input{width:20px;height:20px;accent-color:var(--accent)}
 
-  /* colonne droite */
   .side{flex:1 1 340px;min-width:300px}
   .side h3{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);margin:0 0 12px}
   .steps{list-style:none;padding:0;margin:0 0 20px;counter-reset:s}
   .steps li{counter-increment:s;position:relative;padding:0 0 14px 34px;font-size:13.5px;line-height:1.5}
-  .steps li:before{
-    content:counter(s);position:absolute;left:0;top:-1px;width:23px;height:23px;border-radius:50%;
-    background:var(--accent-soft);color:var(--accent);font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center
-  }
-  .steps li b{font-weight:700}
+  .steps li:before{content:counter(s);position:absolute;left:0;top:-1px;width:23px;height:23px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
   .note{font-size:12px;color:var(--dim);line-height:1.6;border-left:2px solid var(--line);padding-left:12px}
 </style>
 </head>
@@ -157,8 +138,8 @@
 <div class="wrap">
   <div class="head">
     <div>
-      <h1>Maquette · Suivi des maux de tête</h1>
-      <p>Simulateur cliquable de l'app Android. Parcours réel, données simulées plausibles, aucun réseau sollicité. Bascule clair / sombre en haut à droite.</p>
+      <h1>Maquette v2 · Suivi des maux de tête</h1>
+      <p>Ajout des déclencheurs, du médicament, du profil horaire, de la clôture en un tap, des crises de plus de 24 h, de l'ergonomie « en crise », du PDF, de la biométrie et de la sauvegarde mensuelle.</p>
     </div>
     <button class="btn-theme" id="btnTheme">Thème clair</button>
   </div>
@@ -179,15 +160,17 @@
     </div>
 
     <div class="side">
-      <h3>Ce que montre la maquette</h3>
+      <h3>Les ajouts de cette version</h3>
       <ol class="steps">
-        <li><b>Saisir</b> : date, heure de début et heure de fin, en heures pleines (8h, 9h). Aucune minute à taper.</li>
-        <li><b>Crise qui dépasse la soirée</b> : si la fin passe minuit, l'app comprend qu'elle s'est poursuivie le lendemain, calcule la durée et le signale.</li>
-        <li><b>Historique</b> : plage horaire, durée, badge « soirée dépassée ». Toucher une ligne la rouvre en modification.</li>
-        <li><b>Stats</b> : crises du mois, intensité et durée moyennes, crises longues, jours sans douleur, graphique 30 jours, effet du sommeil.</li>
-        <li><b>Export</b> : CSV Excel, sauvegarde JSON, restauration, puis vérification de mise à jour de l'APK.</li>
+        <li><b>Démarrer / clôturer en un tap</b> : bandeau « crise en cours » avec la durée qui tourne, et bouton « Clôturer maintenant ».</li>
+        <li><b>Déclencheurs suspectés</b> : stress, fatigue, écran, chaleur, règles, sport, bruit, parfum, saut de repas.</li>
+        <li><b>Médicament</b> : lequel, quelle efficacité, et compteur mensuel de jours de prise avec le seuil d'alerte.</li>
+        <li><b>Crises de plus de 24 h</b> : fin reportée à J+1, J+2 ou J+3.</li>
+        <li><b>Ergonomie en crise</b> : gros boutons, sections secondaires repliées, sombre par défaut.</li>
+        <li><b>Stats honnêtes</b> : profil horaire, jour de semaine, tendance, effectifs affichés, rien de conclu sous 5 cas.</li>
+        <li><b>Réglages</b> : PDF pour le médecin, verrouillage biométrique, sauvegarde JSON automatique mensuelle.</li>
       </ol>
-      <p class="note">Données de démonstration uniquement. L'app réelle stocke tout en local sur le téléphone (Room), sans compte ni cloud.</p>
+      <p class="note">Données de démonstration uniquement. L'app réelle stocke tout en local sur le téléphone, sans compte ni cloud.</p>
     </div>
   </div>
 </div>
@@ -208,9 +191,16 @@ function jourAvant(n, h) {
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 const MOIS_COURT = ["janv","févr","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"];
 const JOURS = ["dim","lun","mar","mer","jeu","ven","sam"];
+const JOURS_LONG = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const DECLENCH = ["Stress","Fatigue","Écran","Chaleur","Règles","Sport","Bruit","Parfum","Saut de repas","Sommeil court"];
 const REPAS = ["Sucré","Alcool","Fromage","Caféine","Charcuterie","Friture","Viande rouge","Repas sauté"];
 const SYMPT = ["Aura visuelle","Nausée","Gêne à la lumière","Gêne au bruit","Vertiges","Odeurs"];
 const LOCS = ["Tempes","Front","Arrière","Nuque","Un seul côté","Les deux côtés","Autour des yeux"];
+const MEDOCS = ["Paracétamol","AINS / ibuprofène","Triptan","Autre"];
+const EFFIC = ["Soulagé","Un peu","Pas du tout"];
+const SEUIL_MEDOC = 15;      // jours par mois, antalgiques simples (ICHD-3)
+const SEUIL_TRIPTAN = 10;    // jours par mois, triptans et dérivés
+const MIN_CAS = 5;           // sous ce nombre de cas, aucune conclusion affichée
 
 function couleurNiveau(n) {
   if (n <= 1) return "var(--n0)";
@@ -232,61 +222,75 @@ function libelleNiveau(n) {
 const sommeilTxt = (s) => s === "bon" ? "Bon" : s === "moyen" ? "Moyen" : "Mauvais";
 const heureTxt = (h) => h + "h";
 
-/* durée en heures pleines */
 function dureeH(e) {
   if (!e.fin) return Math.max(1, Math.round((Date.now() - e.d) / 3600000));
   return Math.max(0, Math.round((e.fin - e.d) / 3600000));
 }
 function dureeTxt(h) { return h <= 0 ? "moins d'1 h" : h + " h"; }
 function lendemain(e) { return !!e.fin && iso(e.fin) !== iso(e.d); }
-/* dépasse la soirée : franchit minuit, ou dure 6 h et plus, ou est encore en cours */
-function depasseSoiree(e) { return !e.fin || lendemain(e) || dureeH(e) >= 6; }
-function plageTxt(e) {
-  return heureTxt(e.d.getHours()) + " → " + (e.fin ? heureTxt(e.fin.getHours()) : "en cours");
+function nbJours(e) {
+  if (!e.fin) return 0;
+  const a = new Date(e.d.getFullYear(), e.d.getMonth(), e.d.getDate());
+  const b = new Date(e.fin.getFullYear(), e.fin.getMonth(), e.fin.getDate());
+  return Math.round((b - a) / 86400000);
 }
+function depasseSoiree(e) { return !e.fin || lendemain(e) || dureeH(e) >= 6; }
+function plageTxt(e) { return heureTxt(e.d.getHours()) + " → " + (e.fin ? heureTxt(e.fin.getHours()) : "en cours"); }
 
 /* ---------- données simulées ---------- */
+function ilYA(heures) {
+  const d = new Date(Date.now() - heures * 3600000);
+  d.setMinutes(0, 0, 0);
+  return d;
+}
 let DATA = [
   { id: "s10", d: jourAvant(0, 7),  fin: jourAvant(0, 10), niveau: 4, sommeil: "moyen", reveils: 1,
-    repas: ["Caféine"], symptomes: ["Gêne à la lumière"], loc: ["Front"], com: "Réveil avec la douleur, un café et c'est passé." },
+    declencheurs: ["Écran"], repas: ["Caféine"], symptomes: ["Gêne à la lumière"], loc: ["Front"],
+    medoc: "Paracétamol", efficacite: "Soulagé", com: "Réveil avec la douleur, un café et c'est passé." },
   { id: "s9",  d: jourAvant(1, 14), fin: jourAvant(1, 18), niveau: 6, sommeil: "moyen", reveils: 1,
-    repas: ["Caféine","Sucré"], symptomes: ["Nausée","Gêne à la lumière"], loc: ["Tempes"], com: "Après la réunion de 14 h, pièce sans fenêtre." },
+    declencheurs: ["Stress"], repas: ["Caféine","Sucré"], symptomes: ["Nausée","Gêne à la lumière"], loc: ["Tempes"],
+    medoc: "Paracétamol", efficacite: "Un peu", com: "Réunion de 14 h, pièce sans fenêtre." },
   { id: "s8",  d: jourAvant(3, 20), fin: jourAvant(2, 9),  niveau: 8, sommeil: "mauvais", reveils: 3,
-    repas: ["Alcool","Fromage"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit"], loc: ["Un seul côté"], com: "Aura 20 min avant, douleur toute la soirée et la nuit." },
+    declencheurs: ["Fatigue","Alcool"], repas: ["Alcool","Fromage"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit"],
+    loc: ["Un seul côté"], medoc: "Triptan", efficacite: "Soulagé", com: "Toute la soirée et la nuit." },
   { id: "s7",  d: jourAvant(5, 9),  fin: jourAvant(5, 11), niveau: 3, sommeil: "bon", reveils: 0,
-    repas: ["Charcuterie"], symptomes: [], loc: ["Front"], com: "" },
+    declencheurs: [], repas: ["Charcuterie"], symptomes: [], loc: ["Front"], medoc: null, efficacite: null, com: "" },
   { id: "s6",  d: jourAvant(8, 17), fin: jourAvant(8, 22), niveau: 5, sommeil: "mauvais", reveils: 2,
-    repas: ["Caféine","Viande rouge"], symptomes: ["Gêne à la lumière"], loc: ["Les deux côtés","Tempes"], com: "Journée chargée, peu d'eau." },
+    declencheurs: ["Écran","Stress"], repas: ["Caféine","Viande rouge"], symptomes: ["Gêne à la lumière"],
+    loc: ["Les deux côtés","Tempes"], medoc: "AINS / ibuprofène", efficacite: "Un peu", com: "Journée chargée, peu d'eau." },
   { id: "s5",  d: jourAvant(12, 11), fin: jourAvant(12, 15), niveau: 7, sommeil: "moyen", reveils: 1,
-    repas: ["Sucré","Friture"], symptomes: ["Nausée"], loc: ["Nuque"], com: "Tension nuque depuis la veille." },
-  { id: "s4",  d: jourAvant(16, 19), fin: null, niveau: 2, sommeil: "bon", reveils: 0,
-    repas: [], symptomes: [], loc: ["Front"], com: "" },
+    declencheurs: ["Fatigue"], repas: ["Sucré","Friture"], symptomes: ["Nausée"], loc: ["Nuque"],
+    medoc: "Paracétamol", efficacite: "Pas du tout", com: "Tension nuque depuis la veille." },
+  { id: "s4",  d: ilYA(2), fin: null, niveau: 2, sommeil: "bon", reveils: 0,
+    declencheurs: [], repas: [], symptomes: [], loc: ["Front"], medoc: null, efficacite: null, com: "" },
   { id: "s3",  d: jourAvant(19, 15), fin: jourAvant(18, 6), niveau: 9, sommeil: "mauvais", reveils: 3,
-    repas: ["Alcool","Fromage","Charcuterie"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit","Vertiges"], loc: ["Un seul côté","Autour des yeux"], com: "Crise la plus forte du mois, au lit toute la soirée." },
+    declencheurs: ["Sommeil court","Chaleur"], repas: ["Alcool","Fromage","Charcuterie"],
+    symptomes: ["Aura visuelle","Nausée","Gêne au bruit","Vertiges"], loc: ["Un seul côté","Autour des yeux"],
+    medoc: "Triptan", efficacite: "Un peu", com: "Crise la plus forte du mois." },
   { id: "s2",  d: jourAvant(24, 8),  fin: jourAvant(24, 10), niveau: 4, sommeil: "moyen", reveils: 2,
-    repas: ["Caféine"], symptomes: ["Gêne au bruit"], loc: ["Tempes"], com: "" },
+    declencheurs: ["Écran"], repas: ["Caféine"], symptomes: ["Gêne au bruit"], loc: ["Tempes"], medoc: null, efficacite: null, com: "" },
   { id: "s1",  d: jourAvant(28, 19), fin: jourAvant(28, 20), niveau: 5, sommeil: "bon", reveils: 0,
-    repas: ["Repas sauté"], symptomes: ["Vertiges"], loc: ["Front","Tempes"], com: "Repas sauté, hypoglycémie probable." }
+    declencheurs: ["Saut de repas"], repas: ["Repas sauté"], symptomes: ["Vertiges"], loc: ["Front","Tempes"],
+    medoc: "Paracétamol", efficacite: "Soulagé", com: "Repas sauté, hypoglycémie probable." }
 ];
 
 let seq = 0;
 let _rendus = 0;
-let S = { ecran: "saisir", edition: null, fichierCSV: null, fichierJSON: null, majEtat: null, form: formNeuf() };
+let S = {
+  ecran: "saisir", edition: null, toutAfficher: false,
+  fichierCSV: null, fichierJSON: null, fichierPDF: null, majEtat: null,
+  bio: true, sauvegardeAuto: true,
+  form: formNeuf()
+};
 
 function formNeuf() {
   const now = new Date();
   return {
-    jour: iso(now),
-    hDebut: now.getHours(),
-    hFin: Math.min(23, now.getHours() + 1),
-    enCours: false,
-    niveau: 5,
-    sommeil: "moyen",
-    reveils: 0,
-    repas: [],
-    symptomes: [],
-    loc: [],
-    com: ""
+    jour: iso(now), hDebut: now.getHours(), hFin: Math.min(23, now.getHours() + 1),
+    enCours: false, decalage: 1,
+    niveau: 5, sommeil: "moyen", reveils: 0,
+    declencheurs: [], repas: [], symptomes: [], loc: [],
+    medoc: null, efficacite: null, com: ""
   };
 }
 function debutDepuis(f) {
@@ -297,7 +301,7 @@ function finDepuis(f) {
   if (f.enCours) return null;
   const p = f.jour.split("-").map(Number);
   const dt = new Date(p[0], p[1] - 1, p[2], f.hFin, 0, 0, 0);
-  if (f.hFin < f.hDebut) dt.setDate(dt.getDate() + 1);
+  if (f.hFin < f.hDebut) dt.setDate(dt.getDate() + (f.decalage || 1));
   return dt;
 }
 
@@ -315,7 +319,6 @@ function toast(msg) {
 function render() {
   _rendus++;
   $("#content").innerHTML = VUES[S.ecran]();
-  $("#content").scrollTop = S._scroll || 0;
   rendreNav();
 }
 function rendreNav() {
@@ -337,9 +340,21 @@ const VUES = {};
 VUES.saisir = function () {
   const f = S.form;
   const heures = Array.from({ length: 24 }, (_, h) => h);
+  const enCours = DATA.find(e => !e.fin);
+  const bandeau = enCours ? `
+    <div class="encours">
+      <b>Crise en cours depuis ${heureTxt(enCours.d.getHours())}</b>
+      <div class="sub2">durée ${dureeTxt(dureeH(enCours))} · intensité ${enCours.niveau}/10</div>
+      <button class="btn-clot" data-action="cloturer">Clôturer maintenant</button>
+    </div>` : `
+    <button class="cta big" data-action="demarrer" style="margin-bottom:12px">Démarrer une crise maintenant</button>`;
+
+  const nbDecl = f.declencheurs.length;
   return `
   <div class="h2">${S.edition ? "Modifier la crise" : "Nouvelle crise"}</div>
-  <p class="sub">${S.edition ? "Crise du " + fmtDate(S.edition.d) : "Heures pleines, 30 secondes suffisent."}</p>
+  <p class="sub">${S.edition ? "Crise du " + fmtDate(S.edition.d) : "Heures pleines, gros boutons, 30 secondes."}</p>
+
+  ${bandeau}
 
   <div class="card">
     <div class="card-h"><span class="lbl">Quand</span><span class="hint">heures pleines</span></div>
@@ -349,8 +364,15 @@ VUES.saisir = function () {
       <span class="arrow">→</span>
       <select id="fHf" aria-label="heure de fin" ${f.enCours ? "disabled" : ""}>${heures.map(h => '<option value="' + h + '" ' + (h === f.hFin ? "selected" : "") + '>' + h + 'h</option>').join("")}</select>
     </div>
+    ${f.hFin < f.hDebut && !f.enCours ? `
     <div class="row" style="margin-top:10px">
-      <button class="chip sm ${f.enCours ? "on" : ""}" data-action="encours">Crise en cours</button>
+      <span class="hint">Se termine</span>
+      <select id="fDecal" aria-label="décalage">
+        ${[1,2,3].map(n => '<option value="' + n + '" ' + (f.decalage === n ? "selected" : "") + '>J+' + n + '</option>').join("")}
+      </select>
+    </div>` : ""}
+    <div class="row" style="margin-top:10px">
+      <button class="chip big ${f.enCours ? "on" : ""}" data-action="encours">Crise en cours</button>
     </div>
     <div id="plage" class="plage">${resumePlage(f)}</div>
   </div>
@@ -368,7 +390,7 @@ VUES.saisir = function () {
   <div class="card">
     <div class="card-h"><span class="lbl">Sommeil la veille</span></div>
     <div class="chips">
-      ${["bon","moyen","mauvais"].map(v => `<button class="chip ${f.sommeil === v ? "on" : ""}" data-sommeil="${v}">${sommeilTxt(v)}</button>`).join("")}
+      ${["bon","moyen","mauvais"].map(v => `<button class="chip big ${f.sommeil === v ? "on" : ""}" data-sommeil="${v}">${sommeilTxt(v)}</button>`).join("")}
     </div>
     <div class="card-h" style="margin:12px 0 0"><span class="hint">Réveils nocturnes</span>
       <span class="stepper">
@@ -377,50 +399,80 @@ VUES.saisir = function () {
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-h"><span class="lbl">Repas d'avant</span><span class="hint">plusieurs choix</span></div>
-    <div class="chips">
+  <details class="sec" ${S.toutAfficher || nbDecl ? "open" : ""}>
+    <summary>Déclencheurs suspectés ${nbDecl ? '<span class="cnt">' + nbDecl + ' choisi' + (nbDecl > 1 ? "s" : "") + '</span>' : ""}</summary>
+    <div class="body"><div class="chips">
+      ${DECLENCH.map(v => `<button class="chip sm ${f.declencheurs.includes(v) ? "on" : ""}" data-decl="${v}">${v}</button>`).join("")}
+    </div></div>
+  </details>
+
+  <details class="sec" ${S.toutAfficher || f.medoc ? "open" : ""}>
+    <summary>Médicament pris ${f.medoc ? '<span class="cnt">' + f.medoc + '</span>' : ""}</summary>
+    <div class="body">
+      <div class="chips">
+        ${MEDOCS.map(v => `<button class="chip sm ${f.medoc === v ? "on" : ""}" data-medoc="${v}">${v}</button>`).join("")}
+      </div>
+      ${f.medoc ? `<div class="hint" style="margin:12px 0 6px">Efficacité</div>
+      <div class="chips">${EFFIC.map(v => `<button class="chip sm ${f.efficacite === v ? "on" : ""}" data-effic="${v}">${v}</button>`).join("")}</div>` : ""}
+      <div class="hint" style="margin-top:10px">${joursMedocMois()} jour${joursMedocMois() > 1 ? "s" : ""} de prise ce mois · seuil ${SEUIL_MEDOC} j (${SEUIL_TRIPTAN} j pour un triptan)</div>
+    </div>
+  </details>
+
+  <details class="sec" ${S.toutAfficher || f.repas.length ? "open" : ""}>
+    <summary>Repas d'avant ${f.repas.length ? '<span class="cnt">' + f.repas.length + '</span>' : ""}</summary>
+    <div class="body"><div class="chips">
       ${REPAS.map(v => `<button class="chip sm ${f.repas.includes(v) ? "on" : ""}" data-repas="${v}">${v}</button>`).join("")}
-    </div>
-  </div>
+    </div></div>
+  </details>
 
-  <div class="card">
-    <div class="card-h"><span class="lbl">Symptômes</span><span class="hint">plusieurs choix</span></div>
-    <div class="chips">
-      ${SYMPT.map(v => `<button class="chip sm ${f.symptomes.includes(v) ? "on" : ""}" data-sympt="${v}">${v}</button>`).join("")}
+  <details class="sec" ${S.toutAfficher || f.symptomes.length || f.loc.length ? "open" : ""}>
+    <summary>Symptômes et localisation ${(f.symptomes.length + f.loc.length) ? '<span class="cnt">' + (f.symptomes.length + f.loc.length) + '</span>' : ""}</summary>
+    <div class="body">
+      <div class="hint" style="margin-bottom:6px">Symptômes</div>
+      <div class="chips">${SYMPT.map(v => `<button class="chip sm ${f.symptomes.includes(v) ? "on" : ""}" data-sympt="${v}">${v}</button>`).join("")}</div>
+      <div class="hint" style="margin:12px 0 6px">Localisation</div>
+      <div class="chips">${LOCS.map(v => `<button class="chip sm ${f.loc.includes(v) ? "on" : ""}" data-loc="${v}">${v}</button>`).join("")}</div>
     </div>
-  </div>
+  </details>
 
-  <div class="card">
-    <div class="card-h"><span class="lbl">Localisation</span></div>
-    <div class="chips">
-      ${LOCS.map(v => `<button class="chip sm ${f.loc.includes(v) ? "on" : ""}" data-loc="${v}">${v}</button>`).join("")}
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-h"><span class="lbl">Commentaires</span><span class="hint">facultatif</span></div>
-    <textarea id="fCom" placeholder="Contexte, médicament pris, ce qui a aidé...">${f.com}</textarea>
-  </div>
+  <details class="sec" ${S.toutAfficher || f.com ? "open" : ""}>
+    <summary>Commentaire</summary>
+    <div class="body"><textarea id="fCom" placeholder="Contexte, ce qui a aidé...">${f.com}</textarea></div>
+  </details>
 
   <button class="cta" data-action="enregistrer">${S.edition ? "Mettre à jour" : "Enregistrer"}</button>
   ${S.edition ? '<button class="cta ghost" data-action="annulerEdition">Annuler</button>' : ""}
-  <button class="cta ghost" data-action="vider">Réinitialiser</button>
-  <div class="hint" style="text-align:center;margin:10px 0 4px">${DATA.length} crise${DATA.length > 1 ? "s" : ""} enregistrée${DATA.length > 1 ? "s" : ""} · stockage local</div>
+  <div class="row" style="justify-content:space-between;margin-top:10px">
+    <button class="chip sm" data-action="tout">${S.toutAfficher ? "Masquer le détail" : "Tout afficher"}</button>
+    <button class="chip sm" data-action="vider">Réinitialiser</button>
+  </div>
+  <div class="hint" style="text-align:center;margin:10px 0 4px">${DATA.length} crises · stockage local</div>
   `;
 };
 
 function resumePlage(f) {
   if (f.enCours) return "En cours depuis " + heureTxt(f.hDebut) + " · pas encore d'heure de fin";
   const prov = { d: debutDepuis(f), fin: finDepuis(f) };
-  if (lendemain(prov)) return "Se termine le lendemain à " + heureTxt(f.hFin) + " · " + dureeTxt(dureeH(prov)) + " · a dépassé la soirée";
-  return "Même journée · " + dureeTxt(dureeH(prov)) + (dureeH(prov) >= 6 ? " · a dépassé la soirée" : "");
+  if (lendemain(prov)) {
+    return "Se termine à J+" + nbJours(prov) + " à " + heureTxt(f.hFin) + " · " + dureeTxt(dureeH(prov)) + " · dépasse la soirée";
+  }
+  return "Même journée · " + dureeTxt(dureeH(prov)) + (dureeH(prov) >= 6 ? " · dépasse la soirée" : "");
+}
+
+/* jours distincts avec médicament dans le mois courant */
+function joursMedocMois() {
+  const now = new Date();
+  const set = new Set();
+  DATA.forEach(e => {
+    if (e.medoc && e.d.getMonth() === now.getMonth() && e.d.getFullYear() === now.getFullYear()) set.add(iso(e.d));
+  });
+  return set.size;
 }
 
 /* ===== HISTORIQUE ===== */
 VUES.histo = function () {
   const tri = DATA.slice().sort((a, b) => b.d - a.d);
-  if (!tri.length) return '<div class="empty">Aucune crise enregistrée.<br>Commence par l\'onglet Saisir.</div>';
+  if (!tri.length) return '<div class="empty">Aucune crise enregistrée.</div>';
   let html = "";
   let moisCourant = null;
   tri.forEach(e => {
@@ -430,16 +482,19 @@ VUES.histo = function () {
       html += '<div class="mois">' + MOIS[e.d.getMonth()] + " " + e.d.getFullYear() + "</div>";
     }
     const details = [plageTxt(e)];
-    if (lendemain(e)) details.push("lendemain");
+    if (lendemain(e)) details.push("J+" + nbJours(e));
     details.push(dureeTxt(dureeH(e)));
     details.push("sommeil " + sommeilTxt(e.sommeil).toLowerCase());
-    if (e.reveils > 0) details.push(e.reveils + " réveil" + (e.reveils > 1 ? "s" : ""));
+    if (e.declencheurs.length) details.push(e.declencheurs.slice(0, 2).join(", ").toLowerCase());
     if (e.symptomes.length) details.push(e.symptomes.slice(0, 2).join(", ").toLowerCase());
     html += `
       <div class="item" data-edit="${e.id}">
         <span class="dot" style="background:${couleurNiveau(e.niveau)}"></span>
         <span style="flex:1;min-width:0">
-          <span class="d1">${JOURS[e.d.getDay()]} ${e.d.getDate()} ${MOIS_COURT[e.d.getMonth()]}.${depasseSoiree(e) ? '<span class="tag">soirée dépassée</span>' : ""}</span>
+          <span class="d1">${JOURS[e.d.getDay()]} ${e.d.getDate()} ${MOIS_COURT[e.d.getMonth()]}.
+            ${e.medoc ? '<span class="tag med">' + e.medoc.split(" ")[0].toLowerCase() + '</span>' : ""}
+            ${depasseSoiree(e) ? '<span class="tag">soirée dépassée</span>' : ""}
+          </span>
           <span class="d2">${details.join(" · ")}</span>
         </span>
         <span class="niv" style="color:${couleurNiveau(e.niveau)}">${e.niveau}<small>/10</small></span>
@@ -453,84 +508,152 @@ VUES.histo = function () {
 /* ===== STATS ===== */
 VUES.stats = function () {
   const now = new Date();
-  const duMois = DATA.filter(e => e.d.getFullYear() === now.getFullYear() && e.d.getMonth() === now.getMonth());
   const debut30 = jourAvant(29, 0);
   const sur30 = DATA.filter(e => e.d >= debut30);
+  const duMois = DATA.filter(e => e.d.getMonth() === now.getMonth() && e.d.getFullYear() === now.getFullYear());
   const moy = sur30.length ? sur30.reduce((s, e) => s + e.niveau, 0) / sur30.length : 0;
   const dureeMoy = sur30.length ? sur30.reduce((s, e) => s + dureeH(e), 0) / sur30.length : 0;
   const joursCrise = new Set(sur30.map(e => iso(e.d))).size;
-  const sansDouleur = 30 - joursCrise;
   const longues = sur30.filter(depasseSoiree).length;
   const dureeMax = sur30.length ? Math.max.apply(null, sur30.map(dureeH)) : 0;
-  const bon = DATA.filter(e => e.sommeil === "bon");
-  const mauvais = DATA.filter(e => e.sommeil === "mauvais");
-  const moyBon = bon.length ? bon.reduce((s, e) => s + e.niveau, 0) / bon.length : 0;
-  const moyMauvais = mauvais.length ? mauvais.reduce((s, e) => s + e.niveau, 0) / mauvais.length : 0;
 
-  let bars = "";
-  for (let i = 29; i >= 0; i--) {
-    const d = jourAvant(i, 12);
-    const jour = iso(d);
-    const maxN = DATA.filter(e => iso(e.d) === jour).reduce((m, e) => Math.max(m, e.niveau), 0);
-    const h = maxN ? Math.max(6, Math.round(maxN / 10 * 100)) : 3;
-    const c = maxN ? couleurNiveau(maxN) : "var(--line)";
-    bars += '<i style="height:' + h + '%;background:' + c + '" title="' + jour + '"></i>';
+  // profil horaire (24 tranches)
+  const parHeure = new Array(24).fill(0);
+  sur30.forEach(e => { parHeure[e.d.getHours()] += 1; });
+  const maxH = Math.max.apply(null, parHeure.concat([1]));
+  let bars24 = "";
+  for (let h = 0; h < 24; h++) {
+    const v = parHeure[h];
+    bars24 += '<i style="height:' + (v ? Math.max(8, Math.round(v / maxH * 100)) : 3) + '%;opacity:' + (v ? .95 : .25) + '" title="' + h + 'h : ' + v + '"></i>';
   }
+
+  // jour de la semaine (7)
+  const parJour = new Array(7).fill(0);
+  sur30.forEach(e => { parJour[e.d.getDay()] += 1; });
+  const maxJ = Math.max.apply(null, parJour.concat([1]));
+  let bars7 = "";
+  for (let j = 1; j <= 7; j++) {
+    const idx = j % 7;
+    const v = parJour[idx];
+    bars7 += '<i style="height:' + (v ? Math.max(8, Math.round(v / maxJ * 100)) : 3) + '%;opacity:' + (v ? .95 : .25) + '" title="' + JOURS_LONG[idx] + ' : ' + v + '"></i>';
+  }
+
+  // tendance 7 j vs 7 j précédents
+  const j7 = DATA.filter(e => e.d >= jourAvant(6, 0)).length;
+  const j7av = DATA.filter(e => e.d >= jourAvant(13, 0) && e.d < jourAvant(6, 0)).length;
+  const delta = j7 - j7av;
+  const tendance = delta === 0 ? "stable" : (delta > 0 ? "+" + delta + " crise" + (delta > 1 ? "s" : "") : delta + " crise" + (delta < -1 ? "s" : ""));
+
+  // corrélations avec effectif
+  const groupe = (cle, val) => DATA.filter(e => e[cle] === val);
+  const bon = groupe("sommeil", "bon"), mauvais = groupe("sommeil", "mauvais");
+  const moyDe = (arr) => arr.length ? arr.reduce((s, e) => s + e.niveau, 0) / arr.length : 0;
+  const moyBon = moyDe(bon), moyMauvais = moyDe(mauvais);
+  const assezBon = bon.length >= MIN_CAS, assezMauvais = mauvais.length >= MIN_CAS;
+  const medocJours = joursMedocMois();
+  const triptans = DATA.filter(e => e.medoc === "Triptan" && e.d.getMonth() === now.getMonth());
+  const seuil = triptans.length ? SEUIL_TRIPTAN : SEUIL_MEDOC;
+  const alerteMedoc = medocJours >= seuil * 0.8;
 
   return `
   <div class="h2">Statistiques</div>
-  <p class="sub">${MOIS[now.getMonth()]} ${now.getFullYear()} et 30 derniers jours</p>
+  <p class="sub">${MOIS[now.getMonth()]} ${now.getFullYear()} · 30 derniers jours</p>
   <div class="kpis">
-    <div class="kpi"><div class="v">${duMois.length}</div><div class="k">crise${duMois.length > 1 ? "s" : ""} ce mois</div></div>
+    <div class="kpi"><div class="v">${duMois.length}</div><div class="k">crises ce mois</div></div>
     <div class="kpi"><div class="v" style="color:${couleurNiveau(Math.round(moy))}">${moy.toFixed(1)}</div><div class="k">intensité moyenne</div></div>
     <div class="kpi"><div class="v">${dureeMoy.toFixed(1)} h</div><div class="k">durée moyenne</div></div>
-    <div class="kpi"><div class="v">${sansDouleur}</div><div class="k">jours sans douleur</div></div>
+    <div class="kpi"><div class="v">${30 - joursCrise}</div><div class="k">jours sans douleur</div></div>
   </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Tendance</span><span class="hint">7 jours</span></div>
+    <div class="corr"><span>Cette semaine (7 j)</span><b>${j7}</b></div>
+    <div class="corr"><span>Semaine précédente</span><b>${j7av}</b></div>
+    <div class="corr"><span>Évolution</span><b style="color:${delta > 0 ? "var(--bad)" : delta < 0 ? "var(--ok)" : "var(--dim)"}">${tendance}</b></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">À quelle heure</span><span class="hint">début de crise</span></div>
+    <div class="bars h24">${bars24}</div>
+    <div class="legend"><span>0h</span><span>12h</span><span>23h</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Quel jour</span></div>
+    <div class="bars h7">${bars7}</div>
+    <div class="legend"><span>lun</span><span>mer</span><span>ven</span><span>dim</span></div>
+  </div>
+
   <div class="card">
     <div class="card-h"><span class="lbl">Crises longues</span><span class="hint">30 derniers jours</span></div>
     <div class="corr"><span>Ayant dépassé la soirée</span><b style="color:var(--warn)">${longues} sur ${sur30.length}</b></div>
     <div class="corr"><span>Durée la plus longue</span><b>${dureeTxt(dureeMax)}</b></div>
   </div>
+
   <div class="card">
-    <div class="card-h"><span class="lbl">30 derniers jours</span><span class="hint">hauteur = intensité</span></div>
-    <div class="bars">${bars}</div>
-    <div class="legend"><span>il y a 30 j</span><span>aujourd'hui</span></div>
+    <div class="card-h"><span class="lbl">Médicaments ce mois</span>
+      <span class="pill ${alerteMedoc ? "warn" : "ok"}">${medocJours} / ${seuil} jours</span></div>
+    <div class="hint" style="line-height:1.5">Seuil d'alerte : ${SEUIL_MEDOC} jours par mois pour un antalgique simple, ${SEUIL_TRIPTAN} jours pour un triptan, sur plus de 3 mois.</div>
+    ${alerteMedoc ? '<div class="faible">Proche du seuil de céphalée par abus médicamenteux : à évoquer avec ton médecin.</div>' : ""}
   </div>
+
   <div class="card">
-    <div class="card-h"><span class="lbl">Effet du sommeil</span></div>
-    <div class="corr"><span>Après une bonne nuit</span><b style="color:var(--ok)">${moyBon.toFixed(1)} / 10</b></div>
-    <div class="corr"><span>Après une mauvaise nuit</span><b style="color:var(--bad)">${moyMauvais.toFixed(1)} / 10</b></div>
-    <div class="corr"><span>Écart</span><b>+${(moyMauvais - moyBon).toFixed(1)}</b></div>
+    <div class="card-h"><span class="lbl">Effet du sommeil</span><span class="hint">min. ${MIN_CAS} cas</span></div>
+    <div class="corr"><span>Après une bonne nuit <span class="n">n=${bon.length}</span></span>
+      <b style="color:${assezBon ? "var(--ok)" : "var(--dim)"}">${assezBon ? moyBon.toFixed(1) + " / 10" : "trop peu"}</b></div>
+    <div class="corr"><span>Après une mauvaise nuit <span class="n">n=${mauvais.length}</span></span>
+      <b style="color:${assezMauvais ? "var(--bad)" : "var(--dim)"}">${assezMauvais ? moyMauvais.toFixed(1) + " / 10" : "trop peu"}</b></div>
+    <div class="corr"><span>Écart</span>
+      <b>${assezBon && assezMauvais ? "+" + (moyMauvais - moyBon).toFixed(1) : "non conclu"}</b></div>
+    ${!(assezBon && assezMauvais) ? '<div class="faible">Moins de ' + MIN_CAS + ' crises des deux côtés : aucun écart affiché pour ne pas induire en erreur.</div>' : ""}
   </div>
+
   <div class="card">
-    <div class="card-h"><span class="lbl">Repas les plus fréquents avant une crise</span></div>
-    ${topRepas().map(([r, n]) => '<div class="corr"><span>' + r + '</span><b>' + n + '</b></div>').join("")}
+    <div class="card-h"><span class="lbl">Déclencheurs les plus fréquents</span></div>
+    ${freq("declencheurs")}
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Aliments les plus fréquents</span></div>
+    ${freq("repas")}
   </div>`;
 };
 
-function topRepas() {
+function freq(cle) {
   const c = {};
-  DATA.forEach(e => e.repas.forEach(r => { c[r] = (c[r] || 0) + 1; }));
-  return Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  DATA.forEach(e => (e[cle] || []).forEach(v => { c[v] = (c[v] || 0) + 1; }));
+  const top = Object.entries(c).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  if (!top.length) return '<div class="hint">Rien de saisi pour le moment.</div>';
+  const n = DATA.length;
+  return top.map(([v, k]) => '<div class="corr"><span>' + v + ' <span class="n">n=' + k + '</span></span><b>' +
+    Math.round(k / n * 100) + " %</b></div>").join("") +
+    '<div class="faible">Pourcentage calculé sur ' + n + ' crises saisies.</div>';
 }
 
-/* ===== EXPORT ===== */
+/* ===== EXPORT / RÉGLAGES ===== */
 VUES.export = function () {
-  const fichiers = [];
-  if (S.fichierCSV) fichiers.push(S.fichierCSV);
-  if (S.fichierJSON) fichiers.push(S.fichierJSON);
+  const fichiers = [S.fichierCSV, S.fichierJSON, S.fichierPDF].filter(Boolean);
   return `
-  <div class="h2">Export et sauvegarde</div>
+  <div class="h2">Export et réglages</div>
   <p class="sub">Tout reste sur le téléphone, l'export partage le fichier où tu veux.</p>
 
   <div class="card">
-    <div class="card-h"><span class="lbl">Exporter les données</span></div>
-    <button class="cta ghost" data-action="csv" style="margin-top:0">Exporter en CSV (Excel)</button>
+    <div class="card-h"><span class="lbl">Exporter</span></div>
+    <button class="cta ghost" data-action="csv" style="margin-top:0">CSV pour Excel</button>
     <button class="cta ghost" data-action="json">Sauvegarde complète (JSON)</button>
+    <button class="cta ghost" data-action="pdf">Synthèse PDF pour le médecin</button>
     <button class="cta ghost" data-action="restaurer">Restaurer une sauvegarde</button>
     <div class="prog" id="prog"><i></i></div>
     ${fichiers.length ? fichiers.map(f =>
       '<div class="file"><span class="nm">' + f.nom + '</span><span class="ok">' + f.taille + '</span></div>').join("") : ""}
+  </div>
+
+  <div class="card">
+    <div class="card-h"><span class="lbl">Réglages</span></div>
+    <label class="switch"><span>Verrouillage biométrique<br><span class="hint">empreinte à l'ouverture</span></span>
+      <input type="checkbox" id="swBio" ${S.bio ? "checked" : ""}></label>
+    <label class="switch"><span>Sauvegarde automatique<br><span class="hint">un JSON le 1er de chaque mois</span></span>
+      <input type="checkbox" id="swAuto" ${S.sauvegardeAuto ? "checked" : ""}></label>
   </div>
 
   <div class="card">
@@ -539,41 +662,41 @@ VUES.export = function () {
       <span style="color:var(--dim)">Mise à jour GitHub</span>
       <span class="pill ${S.majEtat === "ok" ? "ok" : ""}">${libMaj()}</span>
     </div>
-    <button class="cta ghost" data-action="maj" style="margin-top:12px">Vérifier maintenant</button>
+    <button class="cta ghost" data-action="maj">Vérifier maintenant</button>
   </div>
 
   <div class="card">
     <div class="card-h"><span class="lbl">Confidentialité</span></div>
-    <div class="hint" style="line-height:1.6">Aucun compte, aucun serveur de santé. La seule connexion sortante est la vérification de version sur GitHub.</div>
+    <div class="hint" style="line-height:1.6">Aucun compte, aucun serveur de santé. Seule connexion sortante : la vérification de version sur GitHub.</div>
   </div>`;
 };
 
 function libMaj() {
   if (S.majEtat === "check") return "vérification...";
   if (S.majEtat === "ok") return "à jour";
-  if (S.majEtat === "new") return "v1.1.0 disponible";
   return "jamais vérifié";
 }
 
 /* ---------- actions ---------- */
 function enregistrer() {
   const f = S.form;
-  const d = debutDepuis(f);
-  const fin = finDepuis(f);
+  const d = debutDepuis(f), fin = finDepuis(f);
   if (S.edition) {
-    S.edition.d = d; S.edition.fin = fin; S.edition.niveau = f.niveau;
-    S.edition.sommeil = f.sommeil; S.edition.reveils = f.reveils;
-    S.edition.repas = f.repas.slice(); S.edition.symptomes = f.symptomes.slice();
-    S.edition.loc = f.loc.slice(); S.edition.com = f.com;
+    Object.assign(S.edition, {
+      d: d, fin: fin, niveau: f.niveau, sommeil: f.sommeil, reveils: f.reveils,
+      declencheurs: f.declencheurs.slice(), repas: f.repas.slice(), symptomes: f.symptomes.slice(),
+      loc: f.loc.slice(), medoc: f.medoc, efficacite: f.efficacite, com: f.com
+    });
     S.edition = null;
     toast("Crise mise à jour");
   } else {
     DATA.push({
       id: "n" + (++seq), d: d, fin: fin, niveau: f.niveau, sommeil: f.sommeil, reveils: f.reveils,
-      repas: f.repas.slice(), symptomes: f.symptomes.slice(), loc: f.loc.slice(), com: f.com
+      declencheurs: f.declencheurs.slice(), repas: f.repas.slice(), symptomes: f.symptomes.slice(),
+      loc: f.loc.slice(), medoc: f.medoc, efficacite: f.efficacite, com: f.com
     });
     const e = DATA[DATA.length - 1];
-    toast("Crise enregistrée · " + dureeTxt(dureeH(e)) + (lendemain(e) ? " · lendemain" : ""));
+    toast("Crise enregistrée · " + dureeTxt(dureeH(e)) + (lendemain(e) ? " · J+" + nbJours(e) : ""));
   }
   S.form = formNeuf();
   render();
@@ -581,8 +704,7 @@ function enregistrer() {
 
 function toggle(tab, val) {
   const i = tab.indexOf(val);
-  if (i >= 0) tab.splice(i, 1);
-  else tab.push(val);
+  if (i >= 0) tab.splice(i, 1); else tab.push(val);
 }
 
 const ACTIONS = {
@@ -590,26 +712,29 @@ const ACTIONS = {
   vider() { S.form = formNeuf(); S.edition = null; render(); toast("Formulaire réinitialisé"); },
   annulerEdition() { S.edition = null; S.form = formNeuf(); render(); },
   encours() { S.form.enCours = !S.form.enCours; render(); },
-  csv() {
-    progresser(() => {
-      S.fichierCSV = { nom: "maux-de-tete_" + iso(new Date()) + ".csv", taille: "2,6 Ko" };
-      render();
-      toast("CSV prêt · " + DATA.length + " crises exportées");
+  tout() { S.toutAfficher = !S.toutAfficher; render(); },
+  demarrer() {
+    const now = new Date();
+    DATA.push({
+      id: "n" + (++seq), d: new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0, 0),
+      fin: null, niveau: 5, sommeil: "moyen", reveils: 0, declencheurs: [], repas: [],
+      symptomes: [], loc: [], medoc: null, efficacite: null, com: ""
     });
-  },
-  json() {
-    progresser(() => {
-      S.fichierJSON = { nom: "sauvegarde_maux-de-tete_" + iso(new Date()) + ".json", taille: "9,4 Ko" };
-      render();
-      toast("Sauvegarde complète créée");
-    });
-  },
-  restaurer() { toast("Sélectionne le fichier JSON dans tes téléchargements"); },
-  maj() {
-    S.majEtat = "check";
     render();
-    setTimeout(() => { S.majEtat = "ok"; render(); toast("Tu es à jour · v1.0.0"); }, 1400);
-  }
+    toast("Crise démarrée · à clôturer quand ça se termine");
+  },
+  cloturer() {
+    const e = DATA.find(x => !x.fin);
+    if (!e) return;
+    e.fin = new Date();
+    render();
+    toast("Crise clôturée · " + dureeTxt(dureeH(e)));
+  },
+  csv() { progresser(() => { S.fichierCSV = { nom: "maux-de-tete_" + iso(new Date()) + ".csv", taille: "2,9 Ko" }; render(); toast("CSV prêt · " + DATA.length + " crises"); }); },
+  json() { progresser(() => { S.fichierJSON = { nom: "sauvegarde_maux-de-tete_" + iso(new Date()) + ".json", taille: "10,2 Ko" }; render(); toast("Sauvegarde complète créée"); }); },
+  pdf() { progresser(() => { S.fichierPDF = { nom: "synthese_maux-de-tete_" + iso(new Date()) + ".pdf", taille: "84 Ko" }; render(); toast("Synthèse PDF prête"); }); },
+  restaurer() { toast("Sélectionne le fichier JSON dans tes téléchargements"); },
+  maj() { S.majEtat = "check"; render(); setTimeout(() => { S.majEtat = "ok"; render(); toast("Tu es à jour · v1.0.0"); }, 1400); }
 };
 
 function progresser(fin) {
@@ -633,14 +758,12 @@ function majResume() {
   if (el) el.textContent = resumePlage(S.form);
 }
 
-/* ---------- délégation d'événements ---------- */
+/* ---------- délégation ---------- */
 document.addEventListener("click", (ev) => {
   const nav = ev.target.closest("[data-nav]");
-  if (nav) { S.ecran = nav.dataset.nav; S._scroll = 0; render(); return; }
-
+  if (nav) { S.ecran = nav.dataset.nav; render(); return; }
   const navClick = ev.target.closest("[data-nav-click]");
-  if (navClick) { S.ecran = navClick.dataset.navClick; S._scroll = 0; render(); return; }
-
+  if (navClick) { S.ecran = navClick.dataset.navClick; render(); return; }
   const th = ev.target.closest("#btnTheme");
   if (th) {
     const html = document.documentElement;
@@ -649,28 +772,24 @@ document.addEventListener("click", (ev) => {
     th.textContent = clair ? "Thème sombre" : "Thème clair";
     return;
   }
-
   const som = ev.target.closest("[data-sommeil]");
   if (som) { S.form.sommeil = som.dataset.sommeil; render(); return; }
-
   const rev = ev.target.closest("[data-reveil]");
-  if (rev) {
-    S.form.reveils = Math.max(0, Math.min(9, S.form.reveils + parseInt(rev.dataset.reveil, 10)));
-    render(); return;
-  }
-
+  if (rev) { S.form.reveils = Math.max(0, Math.min(9, S.form.reveils + parseInt(rev.dataset.reveil, 10))); render(); return; }
+  const dec = ev.target.closest("[data-decl]");
+  if (dec) { toggle(S.form.declencheurs, dec.dataset.decl); render(); return; }
   const rep = ev.target.closest("[data-repas]");
   if (rep) { toggle(S.form.repas, rep.dataset.repas); render(); return; }
-
   const sym = ev.target.closest("[data-sympt]");
   if (sym) { toggle(S.form.symptomes, sym.dataset.sympt); render(); return; }
-
   const loc = ev.target.closest("[data-loc]");
   if (loc) { toggle(S.form.loc, loc.dataset.loc); render(); return; }
-
+  const med = ev.target.closest("[data-medoc]");
+  if (med) { S.form.medoc = S.form.medoc === med.dataset.medoc ? null : med.dataset.medoc; render(); return; }
+  const eff = ev.target.closest("[data-effic]");
+  if (eff) { S.form.efficacite = S.form.efficacite === eff.dataset.effic ? null : eff.dataset.effic; render(); return; }
   const act = ev.target.closest("[data-action]");
   if (act && ACTIONS[act.dataset.action]) { ACTIONS[act.dataset.action](); return; }
-
   const ed = ev.target.closest("[data-edit]");
   if (ed) {
     const e = DATA.find(x => x.id === ed.dataset.edit);
@@ -679,8 +798,10 @@ document.addEventListener("click", (ev) => {
       S.form = {
         jour: iso(e.d), hDebut: e.d.getHours(),
         hFin: e.fin ? e.fin.getHours() : Math.min(23, e.d.getHours() + 1),
-        enCours: !e.fin, niveau: e.niveau, sommeil: e.sommeil, reveils: e.reveils,
-        repas: e.repas.slice(), symptomes: e.symptomes.slice(), loc: e.loc.slice(), com: e.com
+        enCours: !e.fin, decalage: Math.max(1, Math.min(3, nbJours(e) || 1)),
+        niveau: e.niveau, sommeil: e.sommeil, reveils: e.reveils,
+        declencheurs: e.declencheurs.slice(), repas: e.repas.slice(), symptomes: e.symptomes.slice(),
+        loc: e.loc.slice(), medoc: e.medoc, efficacite: e.efficacite, com: e.com
       };
       S.ecran = "saisir";
       render();
@@ -689,7 +810,6 @@ document.addEventListener("click", (ev) => {
   }
 });
 
-/* saisie live : les champs ne sont pas re-rendus pour ne pas perdre le focus */
 document.addEventListener("input", (ev) => {
   const t = ev.target;
   if (t.id === "fNiveau") {
@@ -701,16 +821,18 @@ document.addEventListener("input", (ev) => {
   }
   if (t.id === "fJour") { S.form.jour = t.value; majResume(); }
   if (t.id === "fCom") S.form.com = t.value;
+  if (t.id === "swBio") S.bio = t.checked;
+  if (t.id === "swAuto") S.sauvegardeAuto = t.checked;
 });
 
 document.addEventListener("change", (ev) => {
   const t = ev.target;
-  if (t.id === "fHd") { S.form.hDebut = parseInt(t.value, 10); majResume(); }
-  if (t.id === "fHf") { S.form.hFin = parseInt(t.value, 10); majResume(); }
+  if (t.id === "fHd") { S.form.hDebut = parseInt(t.value, 10); majResume(); render(); }
+  if (t.id === "fHf") { S.form.hFin = parseInt(t.value, 10); majResume(); render(); }
+  if (t.id === "fDecal") { S.form.decalage = parseInt(t.value, 10); majResume(); }
   if (t.id === "fJour") { S.form.jour = t.value; majResume(); }
 });
 
-/* ---------- horloge + démarrage ---------- */
 function horloge() {
   const d = new Date();
   $("#horloge").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
@@ -724,10 +846,12 @@ window.__app = {
   count: () => DATA.length,
   form: () => S.form,
   ecran: () => S.ecran,
+  medocJours: () => joursMedocMois(),
   derniere: function () {
     const e = DATA[DATA.length - 1];
-    return { d: e.d.toISOString(), fin: e.fin ? e.fin.toISOString() : null, duree: dureeH(e), depasse: depasseSoiree(e) };
-  }
+    return { d: e.d.toISOString(), fin: e.fin ? e.fin.toISOString() : null, duree: dureeH(e), depasse: depasseSoiree(e), medoc: e.medoc };
+  },
+  enCours: () => DATA.some(e => !e.fin)
 };
 </script>
 </body>
