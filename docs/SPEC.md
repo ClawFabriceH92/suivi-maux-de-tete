@@ -5,7 +5,10 @@
 | Sujet | Décision | Conséquence technique |
 |---|---|---|
 | Champs de saisie | Date, niveau de douleur, sommeil de la veille, repas d'avant, commentaires **+ symptômes (aura, nausée, gêne à la lumière, gêne au bruit, vertiges, odeurs) + localisation (tempes, front, arrière, nuque, un seul côté, les deux côtés, autour des yeux)** | Table Room avec deux listes sérialisées (symptômes, localisations), saisie en cases à cocher |
-| Repas d'avant | Cases à cocher de types d'aliments : sucré, alcool, fromage, caféine, charcuterie, friture, viande rouge, repas sauté | Colonne texte (valeurs séparées par `|`), liste fixe dans l'app, plusieurs choix possibles |
+| Plage horaire | Début **et** fin saisis en **heures pleines uniquement** (8h, 9h), aucune minute à taper | Deux colonnes `heureDebut` / `heureFin` (0 à 23), widgets de type liste déroulante d'heures |
+| Crise qui dépasse la soirée | Si l'heure de fin est antérieure à l'heure de début, la fin est reportée au lendemain et la crise est signalée comme ayant dépassé la soirée | `finLe` = date du lendemain, durée calculée, drapeau `depasseSoiree` (franchit minuit, dure 6 h ou plus, ou est en cours) |
+| Crise en cours | Case « Crise en cours » : pas d'heure de fin, durée = maintenant moins le début | `finLe` nullable, affichage « 20h → en cours » |
+| Repas d'avant | Cases à cocher de types d'aliments : sucré, alcool, fromage, caféine, charcuterie, friture, viande rouge, repas sauté | Colonne texte (valeurs séparées par `\|`), liste fixe dans l'app, plusieurs choix possibles |
 | Sommeil de la veille | Qualité seule (bon / moyen / mauvais) + compteur de réveils nocturnes | Deux colonnes : `sommeil` (enum) et `reveils` (entier 0 à 9) |
 | Export | CSV pour Excel **et** JSON de sauvegarde / restauration | Deux générateurs, partage par FileProvider, restauration qui remplace la base après confirmation |
 | Rappels | Aucun rappel en v1 | Pas de notification, pas d'alarme, pas de permission POST_NOTIFICATIONS |
@@ -18,7 +21,8 @@ Une crise = une ligne.
 
 ```
 id            Long, auto
-dateHeure     Instant (horodatage de la crise, modifiable)
+debutLe       Instant (date + heure pleine de début, modifiable)
+finLe         Instant?, null si la crise est encore en cours
 niveau        Int 0 à 10
 sommeil       BON | MOYEN | MAUVAIS
 reveils       Int 0 à 9
@@ -29,31 +33,45 @@ commentaire   String
 creeLe        Instant (horodatage de la saisie, non modifiable)
 ```
 
+Valeurs dérivées, jamais stockées :
+
+```
+dureeHeures   = (finLe ? finLe : maintenant) - debutLe, en heures pleines
+lendemain     = finLe != null && jour(finLe) != jour(debutLe)
+depasseSoiree = finLe == null || lendemain || dureeHeures >= 6
+```
+
 ## Écrans
 
 ### 1. Saisir (écran d'ouverture)
 
-- Date et heure pré-remplies à maintenant, modifiables.
+- Bloc « Quand » : date, heure de début et heure de fin en listes déroulantes de 0h à 23h.
+  Aucun champ de minutes.
+- Sous le bloc, un bandeau récapitulatif en clair : « Même journée · 1 h », ou
+  « Se termine le lendemain à 9h · 13 h · a dépassé la soirée », ou « En cours depuis 20h ».
+- Case « Crise en cours » qui désactive l'heure de fin.
 - Niveau de douleur : curseur 0 à 10, couleur et libellé qui changent en direct
   (aucune, très légère, gênante, modérée, forte, invalidante).
 - Sommeil de la veille : trois boutons (bon, moyen, mauvais) + compteur de réveils.
-- Repas d'avant : cases à cocher.
-- Symptômes : cases à cocher.
-- Localisation : cases à cocher.
+- Repas d'avant, symptômes, localisation : cases à cocher.
 - Commentaires : zone de texte libre.
-- Bouton « Enregistrer » unique. Après enregistrement : confirmation brève et formulaire remis à zéro.
+- Bouton « Enregistrer » unique. Après enregistrement : confirmation brève avec la durée calculée,
+  puis formulaire remis à zéro.
 - Toucher une ligne de l'historique rouvre ce même écran en modification (« Mettre à jour »).
 
 ### 2. Historique
 
 - Crises triées de la plus récente à la plus ancienne, groupées par mois.
-- Chaque ligne : jour et heure, sommeil et réveils, premiers symptômes, intensité colorée sur 10.
+- Chaque ligne : jour, plage horaire (20h → 9h), mention « lendemain » si la crise a franchi minuit,
+  durée, sommeil et réveils, premiers symptômes, intensité colorée sur 10.
+- Badge « soirée dépassée » sur les crises concernées.
 - Toucher une ligne = modifier.
 
 ### 3. Statistiques
 
 - Crises du mois en cours.
-- Intensité moyenne sur 30 jours glissants.
+- Intensité moyenne et durée moyenne sur 30 jours glissants.
+- Crises longues : nombre ayant dépassé la soirée et durée la plus longue.
 - Jours avec et sans douleur sur 30 jours.
 - Graphique à barres des 30 derniers jours (hauteur = intensité maximale du jour).
 - Effet du sommeil : intensité moyenne après une bonne nuit, après une mauvaise nuit, et l'écart.
@@ -61,7 +79,8 @@ creeLe        Instant (horodatage de la saisie, non modifiable)
 
 ### 4. Export
 
-- Export CSV (séparateur `;`, BOM UTF-8, dates ISO, listes séparées par `|`).
+- Export CSV : `date_debut;heure_debut;date_fin;heure_fin;duree_heures;depasse_soiree;niveau;sommeil;reveils;repas;symptomes;localisations;commentaire`
+  (séparateur `;`, BOM UTF-8, dates ISO, listes séparées par `|`).
 - Sauvegarde complète JSON.
 - Restauration depuis un fichier JSON (confirmation explicite, remplacement total).
 - Version de l'app + vérification manuelle de mise à jour, avec état visible
@@ -72,7 +91,7 @@ creeLe        Instant (horodatage de la saisie, non modifiable)
 - Aucun rappel ni notification.
 - Aucun compte, aucune synchronisation, aucun serveur.
 - Pas de PDF pour le médecin, pas de partage multi-appareils.
-- Pas de médicaments ni de durée de crise (écartés au cadrage).
+- Pas de médicaments (écartés au cadrage).
 
 ## Mise à jour automatique
 
@@ -89,7 +108,15 @@ Identique à l'app Notes de frais (`/root/projects/notes-de-frais`) :
 
 ## Vérifications avant livraison
 
-1. Tests unitaires JVM sur le parseur de version, la génération CSV et JSON, l'export des listes.
+1. Tests unitaires JVM sur le parseur de version, le calcul de durée et de dépassement de soirée,
+   la génération CSV et JSON, l'export des listes.
 2. `apksigner verify --print-certs` sur l'APK publié : même SHA-256 que le keystore local.
 3. `version.json` et `versionCode` de l'APK téléchargé depuis la release `latest` cohérents.
 4. Migrations Room additives uniquement, jamais de `fallbackToDestructiveMigration`.
+
+## Historique du cadrage
+
+- 01/11/2026 : 5 décisions validées (symptômes et localisation ajoutés, repas en cases à cocher,
+  sommeil = qualité + réveils, export CSV + JSON, aucun rappel).
+- 01/11/2026 : ajout d'une plage horaire début / fin en heures pleines et du cas de la crise qui
+  dépasse la soirée (report au lendemain, durée calculée, badge dans l'historique).

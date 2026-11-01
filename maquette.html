@@ -66,7 +66,7 @@
   .card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
   .card-h .lbl{font-size:12.5px;font-weight:700;letter-spacing:.02em}
   .hint{font-size:11px;color:var(--dim)}
-  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .chips{display:flex;gap:8px;flex-wrap:wrap}
   .chip{
     border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;
@@ -74,11 +74,20 @@
   }
   .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
   .chip.sm{padding:6px 10px;font-size:11.5px;font-weight:600}
-  input[type=datetime-local],input[type=text],textarea,select{
-    width:100%;background:var(--panel);border:1px solid var(--line);border-radius:11px;color:var(--fg);
+  input[type=date],input[type=text],textarea,select{
+    background:var(--panel);border:1px solid var(--line);border-radius:11px;color:var(--fg);
     padding:10px 12px;font-size:13px;font-family:inherit;outline:none
   }
-  textarea{min-height:64px;resize:none}
+  input[type=date]{flex:1 1 128px;min-width:0}
+  select{min-width:76px;cursor:pointer;font-weight:700;font-variant-numeric:tabular-nums}
+  select:disabled{opacity:.4}
+  textarea{width:100%;min-height:64px;resize:none}
+  .arrow{color:var(--dim);font-weight:700}
+  .plage{
+    margin-top:10px;font-size:12.5px;font-weight:700;color:var(--fg);
+    background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:10px;
+    padding:9px 11px;line-height:1.45
+  }
   .lvl{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
   .lvl b{font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
   .lvl span{font-size:12.5px;font-weight:700}
@@ -101,9 +110,10 @@
   .item{display:flex;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
   .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
   .item .d1{font-size:13px;font-weight:700}
-  .item .d2{font-size:11.5px;color:var(--dim);margin-top:2px}
+  .item .d2{font-size:11.5px;color:var(--dim);margin-top:2px;line-height:1.4}
   .item .niv{margin-left:auto;text-align:right;font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
   .item .niv small{display:block;font-size:9.5px;font-weight:700;color:var(--dim);letter-spacing:.04em}
+  .tag{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:#f0a52b22;color:var(--warn);margin-left:6px;vertical-align:1px}
   .empty{color:var(--dim);font-size:13px;text-align:center;padding:40px 10px;line-height:1.6}
 
   /* stats */
@@ -171,10 +181,11 @@
     <div class="side">
       <h3>Ce que montre la maquette</h3>
       <ol class="steps">
-        <li><b>Saisir</b> : date et heure déjà remplies, douleur 0 à 10, sommeil de la veille, repas (cases à cocher), symptômes, localisation, commentaire. Un seul bouton.</li>
-        <li><b>Historique</b> : crises groupées par mois, intensité en un coup d'oeil. Toucher une ligne la rouvre en modification.</li>
-        <li><b>Stats</b> : crises du mois, intensité moyenne, jours sans douleur, graphique des 30 derniers jours, effet du sommeil.</li>
-        <li><b>Export</b> : CSV pour Excel, sauvegarde JSON et restauration, puis vérification de mise à jour de l'APK.</li>
+        <li><b>Saisir</b> : date, heure de début et heure de fin, en heures pleines (8h, 9h). Aucune minute à taper.</li>
+        <li><b>Crise qui dépasse la soirée</b> : si la fin passe minuit, l'app comprend qu'elle s'est poursuivie le lendemain, calcule la durée et le signale.</li>
+        <li><b>Historique</b> : plage horaire, durée, badge « soirée dépassée ». Toucher une ligne la rouvre en modification.</li>
+        <li><b>Stats</b> : crises du mois, intensité et durée moyennes, crises longues, jours sans douleur, graphique 30 jours, effet du sommeil.</li>
+        <li><b>Export</b> : CSV Excel, sauvegarde JSON, restauration, puis vérification de mise à jour de l'APK.</li>
       </ol>
       <p class="note">Données de démonstration uniquement. L'app réelle stocke tout en local sur le téléphone (Room), sans compte ni cloud.</p>
     </div>
@@ -188,14 +199,14 @@
 const $ = (s) => document.querySelector(s);
 const pad = (n) => String(n).padStart(2, "0");
 const iso = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
-const isoLocal = (d) => iso(d) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
-function joursAvant(n, h, m) {
+function jourAvant(n, h) {
   const d = new Date();
   d.setDate(d.getDate() - n);
-  d.setHours(h, m || 0, 0, 0);
+  d.setHours(h, 0, 0, 0);
   return d;
 }
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const MOIS_COURT = ["janv","févr","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"];
 const JOURS = ["dim","lun","mar","mer","jeu","ven","sam"];
 const REPAS = ["Sucré","Alcool","Fromage","Caféine","Charcuterie","Friture","Viande rouge","Repas sauté"];
 const SYMPT = ["Aura visuelle","Nausée","Gêne à la lumière","Gêne au bruit","Vertiges","Odeurs"];
@@ -218,48 +229,57 @@ function libelleNiveau(n) {
   if (n <= 8) return "forte";
   return "invalidante";
 }
-function sommeilTxt(s) {
-  return s === "bon" ? "Bon" : s === "moyen" ? "Moyen" : "Mauvais";
+const sommeilTxt = (s) => s === "bon" ? "Bon" : s === "moyen" ? "Moyen" : "Mauvais";
+const heureTxt = (h) => h + "h";
+
+/* durée en heures pleines */
+function dureeH(e) {
+  if (!e.fin) return Math.max(1, Math.round((Date.now() - e.d) / 3600000));
+  return Math.max(0, Math.round((e.fin - e.d) / 3600000));
+}
+function dureeTxt(h) { return h <= 0 ? "moins d'1 h" : h + " h"; }
+function lendemain(e) { return !!e.fin && iso(e.fin) !== iso(e.d); }
+/* dépasse la soirée : franchit minuit, ou dure 6 h et plus, ou est encore en cours */
+function depasseSoiree(e) { return !e.fin || lendemain(e) || dureeH(e) >= 6; }
+function plageTxt(e) {
+  return heureTxt(e.d.getHours()) + " → " + (e.fin ? heureTxt(e.fin.getHours()) : "en cours");
 }
 
 /* ---------- données simulées ---------- */
 let DATA = [
-  { id: "s9", d: joursAvant(0, 7, 15), niveau: 4, sommeil: "moyen", reveils: 1,
+  { id: "s10", d: jourAvant(0, 7),  fin: jourAvant(0, 10), niveau: 4, sommeil: "moyen", reveils: 1,
     repas: ["Caféine"], symptomes: ["Gêne à la lumière"], loc: ["Front"], com: "Réveil avec la douleur, un café et c'est passé." },
-  { id: "s8", d: joursAvant(1, 14, 20), niveau: 6, sommeil: "moyen", reveils: 1,
+  { id: "s9",  d: jourAvant(1, 14), fin: jourAvant(1, 18), niveau: 6, sommeil: "moyen", reveils: 1,
     repas: ["Caféine","Sucré"], symptomes: ["Nausée","Gêne à la lumière"], loc: ["Tempes"], com: "Après la réunion de 14 h, pièce sans fenêtre." },
-  { id: "s7", d: joursAvant(3, 21, 40), niveau: 8, sommeil: "mauvais", reveils: 3,
-    repas: ["Alcool","Fromage"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit"], loc: ["Un seul côté"], com: "Aura 20 min avant, puis douleur derrière l'oeil droit." },
-  { id: "s6", d: joursAvant(5, 9, 10), niveau: 3, sommeil: "bon", reveils: 0,
+  { id: "s8",  d: jourAvant(3, 20), fin: jourAvant(2, 9),  niveau: 8, sommeil: "mauvais", reveils: 3,
+    repas: ["Alcool","Fromage"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit"], loc: ["Un seul côté"], com: "Aura 20 min avant, douleur toute la soirée et la nuit." },
+  { id: "s7",  d: jourAvant(5, 9),  fin: jourAvant(5, 11), niveau: 3, sommeil: "bon", reveils: 0,
     repas: ["Charcuterie"], symptomes: [], loc: ["Front"], com: "" },
-  { id: "s5", d: joursAvant(8, 17, 5), niveau: 5, sommeil: "mauvais", reveils: 2,
+  { id: "s6",  d: jourAvant(8, 17), fin: jourAvant(8, 22), niveau: 5, sommeil: "mauvais", reveils: 2,
     repas: ["Caféine","Viande rouge"], symptomes: ["Gêne à la lumière"], loc: ["Les deux côtés","Tempes"], com: "Journée chargée, peu d'eau." },
-  { id: "s4", d: joursAvant(12, 11, 30), niveau: 7, sommeil: "moyen", reveils: 1,
+  { id: "s5",  d: jourAvant(12, 11), fin: jourAvant(12, 15), niveau: 7, sommeil: "moyen", reveils: 1,
     repas: ["Sucré","Friture"], symptomes: ["Nausée"], loc: ["Nuque"], com: "Tension nuque depuis la veille." },
-  { id: "s3", d: joursAvant(16, 20, 15), niveau: 2, sommeil: "bon", reveils: 0,
+  { id: "s4",  d: jourAvant(16, 19), fin: null, niveau: 2, sommeil: "bon", reveils: 0,
     repas: [], symptomes: [], loc: ["Front"], com: "" },
-  { id: "s2", d: joursAvant(19, 15, 45), niveau: 9, sommeil: "mauvais", reveils: 3,
-    repas: ["Alcool","Fromage","Charcuterie"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit","Vertiges"], loc: ["Un seul côté","Autour des yeux"], com: "Crise la plus forte du mois, au lit 3 h." },
-  { id: "s1", d: joursAvant(24, 8, 0), niveau: 4, sommeil: "moyen", reveils: 2,
+  { id: "s3",  d: jourAvant(19, 15), fin: jourAvant(18, 6), niveau: 9, sommeil: "mauvais", reveils: 3,
+    repas: ["Alcool","Fromage","Charcuterie"], symptomes: ["Aura visuelle","Nausée","Gêne au bruit","Vertiges"], loc: ["Un seul côté","Autour des yeux"], com: "Crise la plus forte du mois, au lit toute la soirée." },
+  { id: "s2",  d: jourAvant(24, 8),  fin: jourAvant(24, 10), niveau: 4, sommeil: "moyen", reveils: 2,
     repas: ["Caféine"], symptomes: ["Gêne au bruit"], loc: ["Tempes"], com: "" },
-  { id: "s0", d: joursAvant(28, 19, 20), niveau: 5, sommeil: "bon", reveils: 0,
+  { id: "s1",  d: jourAvant(28, 19), fin: jourAvant(28, 20), niveau: 5, sommeil: "bon", reveils: 0,
     repas: ["Repas sauté"], symptomes: ["Vertiges"], loc: ["Front","Tempes"], com: "Repas sauté, hypoglycémie probable." }
 ];
 
 let seq = 0;
 let _rendus = 0;
-let S = {
-  ecran: "saisir",
-  edition: null,
-  fichierCSV: null,
-  fichierJSON: null,
-  majEtat: null,
-  form: formNeuf()
-};
+let S = { ecran: "saisir", edition: null, fichierCSV: null, fichierJSON: null, majEtat: null, form: formNeuf() };
 
 function formNeuf() {
+  const now = new Date();
   return {
-    date: isoLocal(new Date()),
+    jour: iso(now),
+    hDebut: now.getHours(),
+    hFin: Math.min(23, now.getHours() + 1),
+    enCours: false,
     niveau: 5,
     sommeil: "moyen",
     reveils: 0,
@@ -268,6 +288,17 @@ function formNeuf() {
     loc: [],
     com: ""
   };
+}
+function debutDepuis(f) {
+  const p = f.jour.split("-").map(Number);
+  return new Date(p[0], p[1] - 1, p[2], f.hDebut, 0, 0, 0);
+}
+function finDepuis(f) {
+  if (f.enCours) return null;
+  const p = f.jour.split("-").map(Number);
+  const dt = new Date(p[0], p[1] - 1, p[2], f.hFin, 0, 0, 0);
+  if (f.hFin < f.hDebut) dt.setDate(dt.getDate() + 1);
+  return dt;
 }
 
 /* ---------- toast ---------- */
@@ -287,7 +318,6 @@ function render() {
   $("#content").scrollTop = S._scroll || 0;
   rendreNav();
 }
-
 function rendreNav() {
   const onglets = [
     ["saisir", "Saisir", '<path d="M12 5v14M5 12h14"/>'],
@@ -306,13 +336,23 @@ const VUES = {};
 /* ===== SAISIR ===== */
 VUES.saisir = function () {
   const f = S.form;
+  const heures = Array.from({ length: 24 }, (_, h) => h);
   return `
   <div class="h2">${S.edition ? "Modifier la crise" : "Nouvelle crise"}</div>
-  <p class="sub">${S.edition ? "Enregistrée le " + fmtDateCourte(new Date(S.edition.d)) : "Renseigne ce que tu ressens, 30 secondes suffisent."}</p>
+  <p class="sub">${S.edition ? "Crise du " + fmtDate(S.edition.d) : "Heures pleines, 30 secondes suffisent."}</p>
 
   <div class="card">
-    <div class="card-h"><span class="lbl">Date et heure</span><span class="hint">pré-remplies</span></div>
-    <input type="datetime-local" id="fDate" value="${f.date}">
+    <div class="card-h"><span class="lbl">Quand</span><span class="hint">heures pleines</span></div>
+    <div class="row">
+      <input type="date" id="fJour" value="${f.jour}">
+      <select id="fHd" aria-label="heure de début">${heures.map(h => '<option value="' + h + '" ' + (h === f.hDebut ? "selected" : "") + '>' + h + 'h</option>').join("")}</select>
+      <span class="arrow">→</span>
+      <select id="fHf" aria-label="heure de fin" ${f.enCours ? "disabled" : ""}>${heures.map(h => '<option value="' + h + '" ' + (h === f.hFin ? "selected" : "") + '>' + h + 'h</option>').join("")}</select>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="chip sm ${f.enCours ? "on" : ""}" data-action="encours">Crise en cours</button>
+    </div>
+    <div id="plage" class="plage">${resumePlage(f)}</div>
   </div>
 
   <div class="card">
@@ -327,7 +367,7 @@ VUES.saisir = function () {
 
   <div class="card">
     <div class="card-h"><span class="lbl">Sommeil la veille</span></div>
-    <div class="chips" id="grpSommeil">
+    <div class="chips">
       ${["bon","moyen","mauvais"].map(v => `<button class="chip ${f.sommeil === v ? "on" : ""}" data-sommeil="${v}">${sommeilTxt(v)}</button>`).join("")}
     </div>
     <div class="card-h" style="margin:12px 0 0"><span class="hint">Réveils nocturnes</span>
@@ -370,6 +410,13 @@ VUES.saisir = function () {
   `;
 };
 
+function resumePlage(f) {
+  if (f.enCours) return "En cours depuis " + heureTxt(f.hDebut) + " · pas encore d'heure de fin";
+  const prov = { d: debutDepuis(f), fin: finDepuis(f) };
+  if (lendemain(prov)) return "Se termine le lendemain à " + heureTxt(f.hFin) + " · " + dureeTxt(dureeH(prov)) + " · a dépassé la soirée";
+  return "Même journée · " + dureeTxt(dureeH(prov)) + (dureeH(prov) >= 6 ? " · a dépassé la soirée" : "");
+}
+
 /* ===== HISTORIQUE ===== */
 VUES.histo = function () {
   const tri = DATA.slice().sort((a, b) => b.d - a.d);
@@ -382,7 +429,9 @@ VUES.histo = function () {
       moisCourant = cle;
       html += '<div class="mois">' + MOIS[e.d.getMonth()] + " " + e.d.getFullYear() + "</div>";
     }
-    const details = [];
+    const details = [plageTxt(e)];
+    if (lendemain(e)) details.push("lendemain");
+    details.push(dureeTxt(dureeH(e)));
     details.push("sommeil " + sommeilTxt(e.sommeil).toLowerCase());
     if (e.reveils > 0) details.push(e.reveils + " réveil" + (e.reveils > 1 ? "s" : ""));
     if (e.symptomes.length) details.push(e.symptomes.slice(0, 2).join(", ").toLowerCase());
@@ -390,7 +439,7 @@ VUES.histo = function () {
       <div class="item" data-edit="${e.id}">
         <span class="dot" style="background:${couleurNiveau(e.niveau)}"></span>
         <span style="flex:1;min-width:0">
-          <span class="d1">${JOURS[e.d.getDay()]} ${e.d.getDate()} ${MOIS[e.d.getMonth()].slice(0,4)}. · ${pad(e.d.getHours())}:${pad(e.d.getMinutes())}</span>
+          <span class="d1">${JOURS[e.d.getDay()]} ${e.d.getDate()} ${MOIS_COURT[e.d.getMonth()]}.${depasseSoiree(e) ? '<span class="tag">soirée dépassée</span>' : ""}</span>
           <span class="d2">${details.join(" · ")}</span>
         </span>
         <span class="niv" style="color:${couleurNiveau(e.niveau)}">${e.niveau}<small>/10</small></span>
@@ -405,19 +454,22 @@ VUES.histo = function () {
 VUES.stats = function () {
   const now = new Date();
   const duMois = DATA.filter(e => e.d.getFullYear() === now.getFullYear() && e.d.getMonth() === now.getMonth());
-  const debut30 = joursAvant(29, 0, 0);
+  const debut30 = jourAvant(29, 0);
   const sur30 = DATA.filter(e => e.d >= debut30);
-  const moy = sur30.length ? (sur30.reduce((s, e) => s + e.niveau, 0) / sur30.length) : 0;
+  const moy = sur30.length ? sur30.reduce((s, e) => s + e.niveau, 0) / sur30.length : 0;
+  const dureeMoy = sur30.length ? sur30.reduce((s, e) => s + dureeH(e), 0) / sur30.length : 0;
   const joursCrise = new Set(sur30.map(e => iso(e.d))).size;
   const sansDouleur = 30 - joursCrise;
+  const longues = sur30.filter(depasseSoiree).length;
+  const dureeMax = sur30.length ? Math.max.apply(null, sur30.map(dureeH)) : 0;
   const bon = DATA.filter(e => e.sommeil === "bon");
   const mauvais = DATA.filter(e => e.sommeil === "mauvais");
-  const moyBon = bon.length ? (bon.reduce((s, e) => s + e.niveau, 0) / bon.length) : 0;
-  const moyMauvais = mauvais.length ? (mauvais.reduce((s, e) => s + e.niveau, 0) / mauvais.length) : 0;
+  const moyBon = bon.length ? bon.reduce((s, e) => s + e.niveau, 0) / bon.length : 0;
+  const moyMauvais = mauvais.length ? mauvais.reduce((s, e) => s + e.niveau, 0) / mauvais.length : 0;
 
   let bars = "";
   for (let i = 29; i >= 0; i--) {
-    const d = joursAvant(i, 12, 0);
+    const d = jourAvant(i, 12);
     const jour = iso(d);
     const maxN = DATA.filter(e => iso(e.d) === jour).reduce((m, e) => Math.max(m, e.niveau), 0);
     const h = maxN ? Math.max(6, Math.round(maxN / 10 * 100)) : 3;
@@ -430,9 +482,14 @@ VUES.stats = function () {
   <p class="sub">${MOIS[now.getMonth()]} ${now.getFullYear()} et 30 derniers jours</p>
   <div class="kpis">
     <div class="kpi"><div class="v">${duMois.length}</div><div class="k">crise${duMois.length > 1 ? "s" : ""} ce mois</div></div>
-    <div class="kpi"><div class="v" style="color:${couleurNiveau(Math.round(moy))}">${moy.toFixed(1)}</div><div class="k">intensité moyenne sur 30 j</div></div>
-    <div class="kpi"><div class="v">${sansDouleur}</div><div class="k">jours sans douleur sur 30 j</div></div>
-    <div class="kpi"><div class="v">${joursCrise}</div><div class="k">jours avec douleur sur 30 j</div></div>
+    <div class="kpi"><div class="v" style="color:${couleurNiveau(Math.round(moy))}">${moy.toFixed(1)}</div><div class="k">intensité moyenne</div></div>
+    <div class="kpi"><div class="v">${dureeMoy.toFixed(1)} h</div><div class="k">durée moyenne</div></div>
+    <div class="kpi"><div class="v">${sansDouleur}</div><div class="k">jours sans douleur</div></div>
+  </div>
+  <div class="card">
+    <div class="card-h"><span class="lbl">Crises longues</span><span class="hint">30 derniers jours</span></div>
+    <div class="corr"><span>Ayant dépassé la soirée</span><b style="color:var(--warn)">${longues} sur ${sur30.length}</b></div>
+    <div class="corr"><span>Durée la plus longue</span><b>${dureeTxt(dureeMax)}</b></div>
   </div>
   <div class="card">
     <div class="card-h"><span class="lbl">30 derniers jours</span><span class="hint">hauteur = intensité</span></div>
@@ -501,30 +558,22 @@ function libMaj() {
 /* ---------- actions ---------- */
 function enregistrer() {
   const f = S.form;
+  const d = debutDepuis(f);
+  const fin = finDepuis(f);
   if (S.edition) {
-    S.edition.niveau = f.niveau;
-    S.edition.d = new Date(f.date);
-    S.edition.sommeil = f.sommeil;
-    S.edition.reveils = f.reveils;
-    S.edition.repas = f.repas.slice();
-    S.edition.symptomes = f.symptomes.slice();
-    S.edition.loc = f.loc.slice();
-    S.edition.com = f.com;
+    S.edition.d = d; S.edition.fin = fin; S.edition.niveau = f.niveau;
+    S.edition.sommeil = f.sommeil; S.edition.reveils = f.reveils;
+    S.edition.repas = f.repas.slice(); S.edition.symptomes = f.symptomes.slice();
+    S.edition.loc = f.loc.slice(); S.edition.com = f.com;
     S.edition = null;
     toast("Crise mise à jour");
   } else {
     DATA.push({
-      id: "n" + (++seq),
-      d: new Date(f.date),
-      niveau: f.niveau,
-      sommeil: f.sommeil,
-      reveils: f.reveils,
-      repas: f.repas.slice(),
-      symptomes: f.symptomes.slice(),
-      loc: f.loc.slice(),
-      com: f.com
+      id: "n" + (++seq), d: d, fin: fin, niveau: f.niveau, sommeil: f.sommeil, reveils: f.reveils,
+      repas: f.repas.slice(), symptomes: f.symptomes.slice(), loc: f.loc.slice(), com: f.com
     });
-    toast("Crise enregistrée · " + DATA.length + " au total");
+    const e = DATA[DATA.length - 1];
+    toast("Crise enregistrée · " + dureeTxt(dureeH(e)) + (lendemain(e) ? " · lendemain" : ""));
   }
   S.form = formNeuf();
   render();
@@ -540,17 +589,17 @@ const ACTIONS = {
   enregistrer,
   vider() { S.form = formNeuf(); S.edition = null; render(); toast("Formulaire réinitialisé"); },
   annulerEdition() { S.edition = null; S.form = formNeuf(); render(); },
+  encours() { S.form.enCours = !S.form.enCours; render(); },
   csv() {
     progresser(() => {
-      const n = DATA.length;
-      S.fichierCSV = { nom: "maux-de-tete_" + iso(new Date()) + ".csv", taille: "2,4 Ko" };
+      S.fichierCSV = { nom: "maux-de-tete_" + iso(new Date()) + ".csv", taille: "2,6 Ko" };
       render();
-      toast("CSV prêt · " + n + " crises exportées");
+      toast("CSV prêt · " + DATA.length + " crises exportées");
     });
   },
   json() {
     progresser(() => {
-      S.fichierJSON = { nom: "sauvegarde_maux-de-tete_" + iso(new Date()) + ".json", taille: "9,1 Ko" };
+      S.fichierJSON = { nom: "sauvegarde_maux-de-tete_" + iso(new Date()) + ".json", taille: "9,4 Ko" };
       render();
       toast("Sauvegarde complète créée");
     });
@@ -571,17 +620,17 @@ function progresser(fin) {
   let v = 0;
   const it = setInterval(() => {
     v += 12 + Math.random() * 18;
-    if (v >= 100) {
-      v = 100;
-      clearInterval(it);
-      setTimeout(fin, 180);
-    }
+    if (v >= 100) { v = 100; clearInterval(it); setTimeout(fin, 180); }
     barre.style.width = v + "%";
   }, 90);
 }
 
-function fmtDateCourte(d) {
-  return JOURS[d.getDay()] + " " + d.getDate() + " " + MOIS[d.getMonth()] + " à " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+function fmtDate(d) {
+  return JOURS[d.getDay()] + " " + d.getDate() + " " + MOIS[d.getMonth()] + " à " + heureTxt(d.getHours());
+}
+function majResume() {
+  const el = $("#plage");
+  if (el) el.textContent = resumePlage(S.form);
 }
 
 /* ---------- délégation d'événements ---------- */
@@ -606,8 +655,7 @@ document.addEventListener("click", (ev) => {
 
   const rev = ev.target.closest("[data-reveil]");
   if (rev) {
-    const d = parseInt(rev.dataset.reveil, 10);
-    S.form.reveils = Math.max(0, Math.min(9, S.form.reveils + d));
+    S.form.reveils = Math.max(0, Math.min(9, S.form.reveils + parseInt(rev.dataset.reveil, 10)));
     render(); return;
   }
 
@@ -629,7 +677,9 @@ document.addEventListener("click", (ev) => {
     if (e) {
       S.edition = e;
       S.form = {
-        date: isoLocal(e.d), niveau: e.niveau, sommeil: e.sommeil, reveils: e.reveils,
+        jour: iso(e.d), hDebut: e.d.getHours(),
+        hFin: e.fin ? e.fin.getHours() : Math.min(23, e.d.getHours() + 1),
+        enCours: !e.fin, niveau: e.niveau, sommeil: e.sommeil, reveils: e.reveils,
         repas: e.repas.slice(), symptomes: e.symptomes.slice(), loc: e.loc.slice(), com: e.com
       };
       S.ecran = "saisir";
@@ -639,7 +689,7 @@ document.addEventListener("click", (ev) => {
   }
 });
 
-/* saisie live (les champs ne sont pas re-rendus pour ne pas perdre le focus) */
+/* saisie live : les champs ne sont pas re-rendus pour ne pas perdre le focus */
 document.addEventListener("input", (ev) => {
   const t = ev.target;
   if (t.id === "fNiveau") {
@@ -649,28 +699,35 @@ document.addEventListener("input", (ev) => {
     if (num) { num.textContent = v; num.style.color = couleurNiveau(v); }
     if (txt) { txt.textContent = libelleNiveau(v); txt.style.color = couleurNiveau(v); }
   }
-  if (t.id === "fDate") S.form.date = t.value;
+  if (t.id === "fJour") { S.form.jour = t.value; majResume(); }
   if (t.id === "fCom") S.form.com = t.value;
 });
 
-/* ---------- horloge + flux vivant ---------- */
+document.addEventListener("change", (ev) => {
+  const t = ev.target;
+  if (t.id === "fHd") { S.form.hDebut = parseInt(t.value, 10); majResume(); }
+  if (t.id === "fHf") { S.form.hFin = parseInt(t.value, 10); majResume(); }
+  if (t.id === "fJour") { S.form.jour = t.value; majResume(); }
+});
+
+/* ---------- horloge + démarrage ---------- */
 function horloge() {
   const d = new Date();
   $("#horloge").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
 }
 setInterval(horloge, 15000);
-
-/* ---------- démarrage ---------- */
 horloge();
-render();
-S.ecran = "saisir";
 render();
 
 window.__app = {
   rendus: () => _rendus,
   count: () => DATA.length,
   form: () => S.form,
-  ecran: () => S.ecran
+  ecran: () => S.ecran,
+  derniere: function () {
+    const e = DATA[DATA.length - 1];
+    return { d: e.d.toISOString(), fin: e.fin ? e.fin.toISOString() : null, duree: dureeH(e), depasse: depasseSoiree(e) };
+  }
 };
 </script>
 </body>
